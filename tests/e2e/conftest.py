@@ -4,34 +4,38 @@ import pytest
 import subprocess
 import time
 import socket
+import os
 from pathlib import Path
 from playwright.sync_api import sync_playwright, Page, Browser
 
 
-def find_free_port():
-    """Find a free port for the dev server."""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('', 0))
-        s.listen(1)
-        port = s.getsockname()[1]
-    return port
-
-
 @pytest.fixture(scope="session")
 def dev_server():
-    """Start the FastAPI dev server for testing.
+    """Connect to existing FastAPI dev server or start new one.
     
     Yields:
         str: Base URL of the running server (e.g., http://localhost:8000)
     """
-    port = find_free_port()
-    base_url = f"http://localhost:{port}"
+    # Check if server is already running on port 8000
+    base_url = "http://localhost:8000"
+    try:
+        import urllib.request
+        urllib.request.urlopen(f"{base_url}/health", timeout=2)
+        print(f"Using existing server at {base_url}")
+        yield base_url
+        return
+    except:
+        pass
     
-    # Start the server
+    # Start new server if not running
+    import tempfile
+    temp_dir = tempfile.mkdtemp()
+    log_file = os.path.join(temp_dir, "server.log")
+    
     proc = subprocess.Popen(
-        ["python", "-m", "uvicorn", "main:app", "--host", "127.0.0.1", "--port", str(port)],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        ["python", "-m", "uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8000"],
+        stdout=open(log_file, "w"),
+        stderr=subprocess.STDOUT,
         cwd=str(Path(__file__).resolve().parents[3]),
     )
     
@@ -47,7 +51,9 @@ def dev_server():
             time.sleep(0.5)
     else:
         proc.terminate()
-        raise RuntimeError(f"Server failed to start within {max_wait} seconds")
+        with open(log_file) as f:
+            log_content = f.read()
+        raise RuntimeError(f"Server failed to start within {max_wait} seconds. Log:\n{log_content}")
     
     yield base_url
     
