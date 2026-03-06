@@ -14,11 +14,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router)
+# Test endpoint (before router to avoid conflicts)
+@app.get("/test", response_class=PlainTextResponse)
+def test():
+    """Simple text test endpoint."""
+    return "Metis Report Engine is running!"
 
+# Main landing page
 @app.get("/", response_class=HTMLResponse)
 def root():
-    """Landing page."""
+    """Landing page with links to API and documentation."""
     return """<!DOCTYPE html>
 <html>
 <head>
@@ -85,12 +90,5 @@ def root():
 </body>
 </html>"""
 
-@app.head("/")
-def root_head():
-    """Handle HEAD requests for root."""
-    return {"status": "ok"}
-
-@app.get("/test", response_class=PlainTextResponse)
-def test():
-    """Simple text test endpoint."""
-    return "Metis Report Engine is running!"
+# Include API routes
+app.include_router(router)
