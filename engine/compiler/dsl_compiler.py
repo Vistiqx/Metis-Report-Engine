@@ -165,7 +165,7 @@ def parse_key_value_block(body: str) -> Dict[str, Any]:
                     idx += 1
                 else:
                     break
-            result[key] = items if items else ""
+            result[key] = items if items else []
             continue
 
         result[key] = coerce_scalar(value)
