@@ -168,6 +168,7 @@ def render_pdf(
     template: Optional[str] = None,
     theme: Optional[str] = None,
     return_manifest: bool = True,
+    skip_quality_gates: bool = False,
 ) -> Dict[str, Any]:
     """Render report to PDF.
     
@@ -176,6 +177,7 @@ def render_pdf(
         template: Optional template name
         theme: Optional theme profile
         return_manifest: Whether to include render manifest
+        skip_quality_gates: Whether to skip quality gate enforcement
         
     Returns:
         PDF file path and optional manifest
@@ -185,6 +187,18 @@ def render_pdf(
         validation = validate_report_with_details(report_json)
         if not validation["valid"]:
             raise HTTPException(status_code=400, detail=validation)
+        
+        # Enforce quality gates (block with warning behavior)
+        quality_result = enforce_quality_gates(report_json)
+        if should_block_generation(quality_result, skip_gates=skip_quality_gates):
+            response = {
+                "status": "blocked",
+                "message": "Quality gates failed. PDF generation blocked.",
+                "quality_gates": quality_result.to_dict(),
+            }
+            if skip_quality_gates:
+                response["note"] = "Use skip_quality_gates=true to override"
+            raise HTTPException(status_code=400, detail=response)
         
         # Generate HTML
         if template == "professional":

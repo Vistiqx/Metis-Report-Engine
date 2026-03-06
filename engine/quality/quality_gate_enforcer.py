@@ -57,6 +57,21 @@ class QualityGateResult:
             "details": details or {},
         })
     
+    @property
+    def error_count(self) -> int:
+        """Return number of errors."""
+        return len(self.errors)
+    
+    @property
+    def warning_count(self) -> int:
+        """Return number of warnings."""
+        return len(self.warnings)
+    
+    @property
+    def info_count(self) -> int:
+        """Return number of info messages."""
+        return len(self.info)
+    
     def to_dict(self) -> Dict[str, Any]:
         """Convert result to dictionary."""
         return {
@@ -64,8 +79,8 @@ class QualityGateResult:
             "errors": self.errors,
             "warnings": self.warnings,
             "info": self.info,
-            "error_count": len(self.errors),
-            "warning_count": len(self.warnings),
+            "error_count": self.error_count,
+            "warning_count": self.warning_count,
             "summary": self._generate_summary(),
         }
     
