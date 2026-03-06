@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/core/risk_model.schema.json",
+  "title": "Risk Model",
+  "type": "object",
+  "properties": {
+    "scale": {
+      "type": "object",
+      "properties": {
+        "likelihood": { "type": "array", "items": { "type": "integer" } },
+        "impact": { "type": "array", "items": { "type": "integer" } },
+        "detectability": { "type": "array", "items": { "type": "integer" } }
+      }
+    },
+    "matrix": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["risk_id", "likelihood", "impact", "score", "severity"],
+        "properties": {
+          "risk_id": { "type": "string" },
+          "likelihood": { "type": "integer" },
+          "impact": { "type": "integer" },
+          "detectability": { "type": ["integer", "null"] },
+          "score": { "type": ["integer", "number"] },
+          "severity": { "type": "string" }
+        }
+      }
+    }
+  }
+}

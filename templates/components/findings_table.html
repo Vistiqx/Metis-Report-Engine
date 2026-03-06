@@ -1,0 +1,26 @@
+
+<div class="section-header">
+  <p class="section-kicker">Detailed Analysis</p>
+  <h2>Findings</h2>
+</div>
+
+<table class="consulting-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Finding</th>
+      <th>Severity</th>
+      <th>Summary</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for finding in findings %}
+    <tr>
+      <td>{{ finding.id }}</td>
+      <td>{{ finding.title }}</td>
+      <td><span class="severity-pill severity-{{ finding.severity|lower }}">{{ finding.severity }}</span></td>
+      <td>{{ finding.summary }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

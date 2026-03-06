@@ -1,0 +1,14 @@
+{
+  "report": {
+    "id": "RPT-001",
+    "title": "Example Report",
+    "type": "risk_assessment",
+    "client": "Example Client",
+    "classification": "Confidential",
+    "version": "1.0",
+    "date_created": "2026-03-06"
+  },
+  "findings": [],
+  "evidence": [],
+  "recommendations": []
+}

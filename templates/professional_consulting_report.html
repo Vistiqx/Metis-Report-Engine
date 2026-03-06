@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ report.title }}</title>
+  <link rel="stylesheet" href="styles/professional_consulting.css">
+</head>
+<body class="theme-vistiqx-consulting">
+  <section class="cover-page">
+    <div class="cover-accent"></div>
+    <div class="cover-content">
+      <p class="eyebrow">{{ report.classification or "Confidential" }}</p>
+      <h1>{{ report.title }}</h1>
+      <p class="subtitle">{{ report.get("subtitle", "Security Intelligence Report") }}</p>
+
+      <div class="cover-meta-grid">
+        <div class="meta-card">
+          <span class="meta-label">Client</span>
+          <span class="meta-value">{{ report.client or "Client" }}</span>
+        </div>
+        <div class="meta-card">
+          <span class="meta-label">Report Type</span>
+          <span class="meta-value">{{ report.report_type or "Assessment" }}</span>
+        </div>
+        <div class="meta-card">
+          <span class="meta-label">Version</span>
+          <span class="meta-value">{{ report.version or "1.0" }}</span>
+        </div>
+        <div class="meta-card">
+          <span class="meta-label">Date</span>
+          <span class="meta-value">{{ report.date_published or report.date_created or "TBD" }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page">
+    {% include "components/executive_summary.html" %}
+  </section>
+
+  <section class="page">
+    <div class="section-header">
+      <p class="section-kicker">Risk Overview</p>
+      <h2>Visual Summary</h2>
+    </div>
+
+    <div class="viz-grid">
+      {% for viz in visualizations %}
+        <article class="viz-card">
+          <h3>{{ viz.title }}</h3>
+          <div class="viz-content">{{ viz.rendered|safe }}</div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="page">
+    {% include "components/findings_table.html" %}
+  </section>
+
+  <section class="page">
+    {% include "components/recommendations_table.html" %}
+  </section>
+</body>
+</html>

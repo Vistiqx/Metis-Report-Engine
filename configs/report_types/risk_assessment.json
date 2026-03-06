@@ -1,0 +1,29 @@
+{
+  "report_type": "risk_assessment",
+  "template_id": "default_risk_assessment",
+  "required_sections": [
+    "report",
+    "executive_summary",
+    "findings",
+    "recommendations",
+    "metrics"
+  ],
+  "section_order": [
+    "cover_page",
+    "executive_summary",
+    "metric_cards",
+    "risk_matrix",
+    "findings_overview",
+    "detailed_findings",
+    "recommendations",
+    "appendix"
+  ],
+  "allowed_visualizations": [
+    "severity_distribution",
+    "risk_matrix",
+    "kpi_summary_cards",
+    "timeline",
+    "comparison_table"
+  ],
+  "theme_profile_default": "consulting_light"
+}

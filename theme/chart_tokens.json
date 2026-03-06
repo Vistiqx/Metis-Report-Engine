@@ -1,0 +1,11 @@
+{
+  "critical_color": "#AC8FFE",
+  "high_color": "#8A6FD6",
+  "medium_color": "#CFC4F7",
+  "low_color": "#E8E8F8",
+  "informational_color": "#D9D9E6",
+  "axis_color": "#4C3D75",
+  "text_color": "#121212",
+  "muted_text_color": "#6E6E80",
+  "gridline_color": "#D7CFFC"
+}

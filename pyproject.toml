@@ -1,0 +1,5 @@
+[project]
+name = "metis-report-engine"
+version = "0.1.0"
+description = "Backend and report rendering contracts for Metis Report Engine"
+requires-python = ">=3.11"

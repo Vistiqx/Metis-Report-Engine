@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/core/recommendation.schema.json",
+  "title": "Recommendation",
+  "type": "object",
+  "required": ["id", "title", "domain", "action", "priority"],
+  "properties": {
+    "id": { "type": "string" },
+    "slug": { "type": ["string", "null"] },
+    "title": { "type": "string" },
+    "short_title": { "type": ["string", "null"] },
+    "category": { "type": ["string", "null"] },
+    "subcategory": { "type": ["string", "null"] },
+    "domain": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "action": {
+      "type": "object",
+      "required": ["type", "description"],
+      "properties": {
+        "type": { "type": "string" },
+        "description": { "type": "string" },
+        "target_objects": { "type": "array", "items": { "type": "object", "additionalProperties": true } }
+      }
+    },
+    "rationale": {
+      "type": "object",
+      "properties": {
+        "summary": { "type": ["string", "null"] },
+        "detailed_reasoning": { "type": ["string", "null"] }
+      }
+    },
+    "priority": { "type": "string" },
+    "urgency": { "type": ["string", "null"] },
+    "recommended_timeline": { "type": ["string", "null"] },
+    "implementation": {
+      "type": "object",
+      "properties": {
+        "effort": { "type": ["string", "null"] },
+        "complexity": { "type": ["string", "null"] },
+        "estimated_duration_days": { "type": ["integer", "null"] },
+        "required_skills": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "properties": {
+        "recommended_owner_role": { "type": ["string", "null"] },
+        "stakeholders": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "expected_outcome": {
+      "type": "object",
+      "properties": {
+        "risk_reduction": { "type": ["string", "null"] },
+        "risk_addressed": { "type": "array", "items": { "type": "string" } },
+        "financial_exposure_reduction": { "type": ["string", "null"] },
+        "compliance_improvement": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "addresses_findings": { "type": "array", "items": { "type": "string" } },
+        "addresses_risks": { "type": "array", "items": { "type": "string" } },
+        "related_controls": { "type": "array", "items": { "type": "string" } },
+        "related_assets": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "implementation_guidance": {
+      "type": "object",
+      "properties": {
+        "steps": { "type": "array", "items": { "type": "string" } },
+        "dependencies": { "type": "array", "items": { "type": "string" } },
+        "verification_method": { "type": ["string", "null"] }
+      }
+    },
+    "tracking": {
+      "type": "object",
+      "properties": {
+        "status": { "type": ["string", "null"] },
+        "tracking_id": { "type": ["string", "null"] },
+        "assigned_team": { "type": ["string", "null"] },
+        "due_date": { "type": ["string", "null"], "format": "date" },
+        "progress_percent": { "type": ["number", "null"] }
+      }
+    },
+    "domain_extension": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

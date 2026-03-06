@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://metis.local/schemas/metis_report_dsl.schema.json",
+  "title": "Metis Report DSL Block",
+  "type": "object",
+  "properties": {
+    "block_type": {
+      "type": "string",
+      "enum": [
+        "report",
+        "engagement",
+        "executive_summary",
+        "metric",
+        "finding",
+        "evidence",
+        "recommendation",
+        "visualization",
+        "appendix"
+      ]
+    },
+    "id": {
+      "type": "string"
+    }
+  },
+  "required": ["block_type"]
+}

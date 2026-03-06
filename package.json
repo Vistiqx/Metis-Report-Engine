@@ -1,0 +1,10 @@
+{
+  "name": "metis-report-engine",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Standalone AI-first report generation system designed for later portability into Metis.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

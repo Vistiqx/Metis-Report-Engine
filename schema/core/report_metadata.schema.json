@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/core/report_metadata.schema.json",
+  "title": "Report Metadata",
+  "type": "object",
+  "required": ["id", "title", "type", "classification", "client", "author", "version", "date_created"],
+  "properties": {
+    "id": { "type": "string" },
+    "title": { "type": "string" },
+    "type": { "type": "string" },
+    "classification": { "type": "string" },
+    "client": { "type": "string" },
+    "author": { "type": "string" },
+    "version": { "type": "string" },
+    "date_created": { "type": "string", "format": "date" },
+    "date_published": { "type": ["string", "null"], "format": "date" },
+    "theme_profile": { "type": ["string", "null"] }
+  }
+}

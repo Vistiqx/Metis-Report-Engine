@@ -1,0 +1,19 @@
+{
+  "name": "vistiqx_consulting",
+  "description": "Professional consulting report profile using the Vistiqx brand palette and token-driven typography.",
+  "base_profile": "default",
+  "mode": "light",
+  "tokens": {
+    "accent_primary": "#AC8FFE",
+    "accent_secondary": "#8A6FD6",
+    "accent_dark": "#4C3D75",
+    "text_primary": "#121212",
+    "text_secondary": "#6E6E80",
+    "surface": "#FFFFFF",
+    "surface_soft": "#E8E8F8",
+    "border": "#D7CFFC",
+    "font_heading_token": "heading",
+    "font_body_token": "body",
+    "font_mono_token": "mono"
+  }
+}

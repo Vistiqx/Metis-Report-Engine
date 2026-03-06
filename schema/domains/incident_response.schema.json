@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/domains/incident_response.schema.json",
+  "title": "Incident Response Extension",
+  "type": "object",
+  "properties": {
+    "incident_response": {
+      "type": "object",
+      "properties": {
+        "incident_id": { "type": ["string", "null"] },
+        "phase": { "type": ["string", "null"] },
+        "timeline_present": { "type": ["boolean", "null"] }
+      }
+    }
+  }
+}

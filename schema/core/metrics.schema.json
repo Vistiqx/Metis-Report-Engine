@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/core/metrics.schema.json",
+  "title": "Metrics",
+  "type": "object",
+  "properties": {
+    "risk_distribution": {
+      "type": "object",
+      "properties": {
+        "critical": { "type": ["integer", "number"] },
+        "high": { "type": ["integer", "number"] },
+        "medium": { "type": ["integer", "number"] },
+        "low": { "type": ["integer", "number"] }
+      }
+    },
+    "financial_exposure": {
+      "type": "object",
+      "properties": {
+        "minimum": { "type": ["integer", "number"] },
+        "maximum": { "type": ["integer", "number"] },
+        "expected_annual_loss_min": { "type": ["integer", "number"] },
+        "expected_annual_loss_max": { "type": ["integer", "number"] }
+      }
+    }
+  }
+}

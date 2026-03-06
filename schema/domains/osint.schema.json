@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/domains/osint.schema.json",
+  "title": "OSINT Extension",
+  "type": "object",
+  "properties": {
+    "osint": {
+      "type": "object",
+      "properties": {
+        "collection_scope": { "type": ["string", "null"] },
+        "confidence_scale": { "type": ["string", "null"] },
+        "threat_actors": { "type": "array", "items": { "type": "string" } },
+        "sources_summary": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

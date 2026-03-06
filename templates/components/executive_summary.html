@@ -1,0 +1,28 @@
+
+<div class="section-header">
+  <p class="section-kicker">Executive Summary</p>
+  <h2>Leadership Overview</h2>
+</div>
+
+<div class="summary-grid">
+  <article class="panel panel-accent">
+    <span class="panel-label">Overall Risk</span>
+    <div class="panel-value">{{ executive_summary.overall_risk_rating or "Not Rated" }}</div>
+    <p class="panel-copy">{{ executive_summary.summary or "Summary pending." }}</p>
+  </article>
+
+  <article class="panel">
+    <span class="panel-label">Critical Risks</span>
+    <div class="panel-value">{{ metrics.risk_distribution.critical if metrics.risk_distribution else 0 }}</div>
+  </article>
+
+  <article class="panel">
+    <span class="panel-label">High Risks</span>
+    <div class="panel-value">{{ metrics.risk_distribution.high if metrics.risk_distribution else 0 }}</div>
+  </article>
+
+  <article class="panel">
+    <span class="panel-label">Medium Risks</span>
+    <div class="panel-value">{{ metrics.risk_distribution.medium if metrics.risk_distribution else 0 }}</div>
+  </article>
+</div>

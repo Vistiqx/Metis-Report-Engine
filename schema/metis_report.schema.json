@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis/metis_report.schema.json",
+  "title": "MetisReport",
+  "type": "object",
+  "required": ["report", "findings", "evidence", "recommendations"],
+  "properties": {
+    "report": {"$ref": "./core/report.schema.json"},
+    "executive_summary": {"type": ["object", "null"]},
+    "metrics": {"$ref": "./core/metrics.schema.json"},
+    "risk_model": {"$ref": "./core/risk_model.schema.json"},
+    "findings": {
+      "type": "array",
+      "items": {"$ref": "./core/finding.schema.json"}
+    },
+    "evidence": {
+      "type": "array",
+      "items": {"$ref": "./core/evidence.schema.json"}
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {"$ref": "./core/recommendation.schema.json"}
+    },
+    "visualizations": {
+      "type": "array",
+      "items": {"$ref": "./visualizations/visualization.schema.json"}
+    },
+    "appendices": {
+      "type": "array",
+      "items": {"type": "object"}
+    }
+  },
+  "additionalProperties": true
+}

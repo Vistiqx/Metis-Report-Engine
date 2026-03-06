@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/core/report.schema.json",
+  "title": "Report",
+  "type": "object",
+  "required": [
+    "report",
+    "engagement",
+    "executive_summary",
+    "findings",
+    "evidence",
+    "recommendations",
+    "visualizations"
+  ],
+  "properties": {
+    "report": { "$ref": "./report_metadata.schema.json" },
+    "engagement": { "$ref": "./engagement.schema.json" },
+    "executive_summary": { "$ref": "./executive_summary.schema.json" },
+    "metrics": { "$ref": "./metrics.schema.json" },
+    "risk_model": { "$ref": "./risk_model.schema.json" },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "./finding.schema.json" }
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "./evidence.schema.json" }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": { "$ref": "./recommendation.schema.json" }
+    },
+    "visualizations": {
+      "type": "array",
+      "items": { "$ref": "../visualizations/visualization.schema.json" }
+    },
+    "appendices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "content"],
+        "properties": {
+          "title": { "type": "string" },
+          "content": { "type": "string" }
+        }
+      }
+    }
+  }
+}

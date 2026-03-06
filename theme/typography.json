@@ -1,0 +1,11 @@
+{
+  "font_family_primary": "Inter, Arial, sans-serif",
+  "font_family_mono": "JetBrains Mono, Consolas, monospace",
+  "font_size_base": "16px",
+  "font_size_small": "13px",
+  "font_size_h1": "32px",
+  "font_size_h2": "24px",
+  "font_weight_regular": 400,
+  "font_weight_semibold": 600,
+  "font_weight_bold": 700
+}

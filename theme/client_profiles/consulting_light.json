@@ -1,0 +1,15 @@
+{
+  "name": "consulting_light",
+  "description": "Light consulting profile for client-facing PDF deliverables.",
+  "base_profile": "default",
+  "mode": "light",
+  "tokens": {
+    "background": "#FFFFFF",
+    "surface": "#F7F7FB",
+    "text_primary": "#121212",
+    "text_secondary": "#4A4A58",
+    "accent_primary": "#4C3D75",
+    "accent_secondary": "#8A6FD6",
+    "border": "#D9D9E6"
+  }
+}

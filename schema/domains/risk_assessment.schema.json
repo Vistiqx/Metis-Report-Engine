@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/domains/risk_assessment.schema.json",
+  "title": "Risk Assessment Extension",
+  "type": "object",
+  "properties": {
+    "risk_assessment": {
+      "type": "object",
+      "properties": {
+        "overall_rating_label": { "type": ["string", "null"] },
+        "annual_incident_probability_min": { "type": ["number", "null"] },
+        "annual_incident_probability_max": { "type": ["number", "null"] },
+        "cost_of_prevention_annual": { "type": ["number", "null"] },
+        "return_on_investment_min": { "type": ["number", "null"] },
+        "return_on_investment_max": { "type": ["number", "null"] }
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/visualizations/visualization.schema.json",
+  "title": "Visualization",
+  "type": "object",
+  "required": ["id", "type", "title", "data_source"],
+  "properties": {
+    "id": { "type": "string" },
+    "type": {
+      "type": "string",
+      "enum": [
+        "kpi_cards",
+        "severity_distribution",
+        "risk_matrix",
+        "financial_exposure_chart",
+        "comparison_bar_chart",
+        "timeline",
+        "recommendation_priority",
+        "appendix_table"
+      ]
+    },
+    "title": { "type": "string" },
+    "data_source": { "type": "string" },
+    "style_variant": { "type": ["string", "null"] },
+    "placement": { "type": ["string", "null"] },
+    "options": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

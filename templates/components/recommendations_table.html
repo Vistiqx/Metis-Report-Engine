@@ -1,0 +1,26 @@
+
+<div class="section-header">
+  <p class="section-kicker">Action Plan</p>
+  <h2>Recommendations</h2>
+</div>
+
+<table class="consulting-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Recommendation</th>
+      <th>Priority</th>
+      <th>Summary</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for recommendation in recommendations %}
+    <tr>
+      <td>{{ recommendation.id }}</td>
+      <td>{{ recommendation.title }}</td>
+      <td><span class="severity-pill severity-{{ recommendation.priority|lower }}">{{ recommendation.priority }}</span></td>
+      <td>{{ recommendation.summary }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

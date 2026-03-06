@@ -1,0 +1,23 @@
+{
+  "report_type": "incident_response",
+  "template_id": "default_incident_response",
+  "required_sections": [
+    "report",
+    "executive_summary",
+    "findings"
+  ],
+  "section_order": [
+    "cover_page",
+    "executive_summary",
+    "timeline",
+    "findings_overview",
+    "detailed_findings",
+    "appendix"
+  ],
+  "allowed_visualizations": [
+    "timeline",
+    "kpi_summary_cards",
+    "comparison_table"
+  ],
+  "theme_profile_default": "executive_dark"
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/core/engagement.schema.json",
+  "title": "Engagement",
+  "type": "object",
+  "required": ["id", "name", "scope_summary"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "scope_summary": { "type": "string" },
+    "jurisdictions": { "type": "array", "items": { "type": "string" } },
+    "audience": { "type": "array", "items": { "type": "string" } },
+    "constraints": { "type": "array", "items": { "type": "string" } },
+    "assumptions": { "type": "array", "items": { "type": "string" } }
+  }
+}

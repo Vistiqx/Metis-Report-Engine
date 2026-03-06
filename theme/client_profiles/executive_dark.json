@@ -1,0 +1,15 @@
+{
+  "name": "executive_dark",
+  "description": "Dark executive presentation profile suitable for premium internal and board-style reporting.",
+  "base_profile": "default",
+  "mode": "dark",
+  "tokens": {
+    "background": "#121212",
+    "surface": "#1C1C22",
+    "text_primary": "#E8E8F8",
+    "text_secondary": "#B9B9C9",
+    "accent_primary": "#AC8FFE",
+    "accent_secondary": "#8A6FD6",
+    "border": "#2C2C36"
+  }
+}

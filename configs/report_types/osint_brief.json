@@ -1,0 +1,23 @@
+{
+  "report_type": "osint_brief",
+  "template_id": "default_osint_brief",
+  "required_sections": [
+    "report",
+    "executive_summary",
+    "findings"
+  ],
+  "section_order": [
+    "cover_page",
+    "executive_summary",
+    "source_summary",
+    "findings_overview",
+    "detailed_findings",
+    "appendix"
+  ],
+  "allowed_visualizations": [
+    "kpi_summary_cards",
+    "timeline",
+    "comparison_table"
+  ],
+  "theme_profile_default": "executive_dark"
+}

@@ -1,0 +1,477 @@
+{
+  "report": {
+    "id": "RPT-2026-001",
+    "title": "Comprehensive Risk Assessment — META AI Glasses in Physical Security Operations",
+    "type": "risk_assessment",
+    "classification": "Confidential",
+    "client": "Signal Security Executive Leadership",
+    "author": "Vistiqx",
+    "version": "1.0",
+    "date_created": "2026-02-19",
+    "date_published": null,
+    "theme_profile": "default"
+  },
+  "engagement": {
+    "id": "ENG-2026-001",
+    "name": "Meta AI Glasses Risk Assessment",
+    "scope_summary": "Assessment of legal, operational, reputational, and financial risks associated with use of Meta AI Glasses in physical security operations.",
+    "jurisdictions": ["US", "Ohio", "West Virginia", "Illinois", "California", "Florida", "Pennsylvania"],
+    "audience": [
+      "CEO / President",
+      "CFO",
+      "COO",
+      "General Counsel",
+      "HR Director",
+      "Board of Directors"
+    ],
+    "constraints": [
+      "No production telemetry available",
+      "Forward-looking risk estimates are scenario-based"
+    ],
+    "assumptions": [
+      "Employees may own or access Meta AI Glasses",
+      "Personnel may travel across jurisdictions with differing consent requirements"
+    ]
+  },
+  "executive_summary": {
+    "overall_risk_rating": "Catastrophic",
+    "summary": "Allowing Meta AI Glasses in physical security operations creates unacceptable legal, reputational, operational, and financial risk that should be addressed through immediate prohibition.",
+    "recommended_action": "Immediate absolute prohibition",
+    "timeline_for_action": "Within 24 hours",
+    "key_statistics": {
+      "financial_exposure": "$1M - $200M+",
+      "estimated_annual_cost_of_prevention": "$20,000",
+      "roi": "50x to 3,000x"
+    },
+    "top_risks": [
+      "Biometric privacy exposure",
+      "Two-party consent criminal exposure",
+      "Loss of data control through cloud upload",
+      "Detection difficulty and covert surveillance risk",
+      "Inability to create a viable limited-use policy"
+    ]
+  },
+  "metrics": {
+    "risk_distribution": {
+      "critical": 5,
+      "high": 3,
+      "medium": 0,
+      "low": 0
+    },
+    "financial_exposure": {
+      "minimum": 1000000,
+      "maximum": 200000000,
+      "expected_annual_loss_min": 500000,
+      "expected_annual_loss_max": 60000000
+    }
+  },
+  "risk_model": {
+    "scale": {
+      "likelihood": [1, 2, 3, 4, 5],
+      "impact": [1, 2, 3, 4, 5],
+      "detectability": [1, 2, 3, 4, 5]
+    },
+    "matrix": [
+      { "risk_id": "F-001", "likelihood": 5, "impact": 5, "detectability": 5, "score": 25, "severity": "Critical" },
+      { "risk_id": "F-002", "likelihood": 4, "impact": 5, "detectability": 4, "score": 20, "severity": "Critical" },
+      { "risk_id": "F-003", "likelihood": 5, "impact": 5, "detectability": 5, "score": 25, "severity": "Critical" }
+    ]
+  },
+  "findings": [
+    {
+      "id": "F-001",
+      "slug": "unauthorized-biometric-capture",
+      "title": "Biometric Data Capture Creates Automatic Legal Exposure",
+      "short_title": "Biometric Capture Exposure",
+      "domain": "risk_assessment",
+      "category": "Privacy",
+      "subcategory": "Biometric Data",
+      "finding_type": "risk",
+      "tags": ["privacy", "biometric", "legal"],
+      "severity": "Critical",
+      "risk": {
+        "likelihood": 5,
+        "impact": 5,
+        "score": 25,
+        "rating": "Critical"
+      },
+      "priority": "Immediate",
+      "summary": "Every face captured may constitute biometric data collection in regulated jurisdictions, creating substantial statutory exposure.",
+      "description": "Use of the glasses may create repeated biometric collection events without adequate consent, policy enforcement, or audit controls.",
+      "business_impact": "Potential litigation, statutory damages, and catastrophic reputation loss.",
+      "technical_impact": "Insufficient enforcement and logging around biometric workflows.",
+      "affected_assets": [{ "id": "AST-001", "type": "device", "name": "Meta AI Glasses" }],
+      "affected_business_units": ["Field Operations", "Executive Security"],
+      "affected_data_types": ["Biometric Identifiers", "Audio", "Video"],
+      "affected_controls": ["Consent Management", "Audit Logging"],
+      "evidence_refs": ["E-001"],
+      "recommendation_refs": ["REC-001"],
+      "status": "Open",
+      "workflow_state": "Reported",
+      "confidence": {
+        "level": "High",
+        "score": 0.92,
+        "rationale": "Supported by legal analysis and workflow assumptions."
+      },
+      "domain_extension": {
+        "risk_assessment": {
+          "financial_exposure_min": 36500000,
+          "financial_exposure_max": 182500000,
+          "regulatory_exposure": ["BIPA"]
+        }
+      }
+    },
+    {
+      "id": "F-002",
+      "slug": "two-party-consent-criminal-exposure",
+      "title": "Two-Party Consent States Create Criminal Exposure",
+      "short_title": "Two-Party Consent Risk",
+      "domain": "risk_assessment",
+      "category": "Legal",
+      "subcategory": "Wiretapping / Consent",
+      "finding_type": "risk",
+      "tags": ["wiretapping", "consent", "criminal"],
+      "severity": "Critical",
+      "risk": {
+        "likelihood": 4,
+        "impact": 5,
+        "score": 20,
+        "rating": "Critical"
+      },
+      "priority": "Immediate",
+      "summary": "Travel into all-party consent states creates unavoidable criminal and civil exposure if recording occurs without valid consent.",
+      "description": "Operational travel patterns and covert recording characteristics make policy-only mitigation weak.",
+      "business_impact": "Criminal exposure, contract damage, and loss of trust.",
+      "technical_impact": "Recording capability cannot be sufficiently constrained through process alone.",
+      "affected_assets": [{ "name": "Meta AI Glasses" }],
+      "affected_business_units": ["Operations"],
+      "affected_data_types": ["Audio", "Video"],
+      "affected_controls": ["Recording Controls"],
+      "evidence_refs": ["E-002"],
+      "recommendation_refs": ["REC-001"],
+      "status": "Open",
+      "workflow_state": "Reported",
+      "confidence": {
+        "level": "High",
+        "score": 0.89,
+        "rationale": "Supported by legal review and travel-context assumptions."
+      },
+      "domain_extension": {}
+    },
+    {
+      "id": "F-003",
+      "slug": "loss-of-control-via-cloud-upload",
+      "title": "Cloud Upload Creates Loss of Control Over Captured Data",
+      "short_title": "Loss of Data Control",
+      "domain": "risk_assessment",
+      "category": "Data Governance",
+      "subcategory": "Third-Party Cloud Handling",
+      "finding_type": "risk",
+      "tags": ["cloud", "confidentiality", "data-governance"],
+      "severity": "Critical",
+      "risk": {
+        "likelihood": 5,
+        "impact": 5,
+        "score": 25,
+        "rating": "Critical"
+      },
+      "priority": "Immediate",
+      "summary": "Automatic upload to third-party systems breaks direct control over captured data and creates confidentiality exposure.",
+      "description": "Once data leaves the organization for cloud processing, control, retention, and downstream use become difficult to constrain.",
+      "business_impact": "Confidentiality and trade secret exposure with client trust implications.",
+      "technical_impact": "Data lifecycle cannot be assured once the content is off-platform.",
+      "affected_assets": [{ "name": "Meta AI Glasses" }],
+      "affected_business_units": ["Operations", "Legal"],
+      "affected_data_types": ["Audio", "Video", "Client Confidential Information"],
+      "affected_controls": ["Data Retention", "Third-Party Handling"],
+      "evidence_refs": ["E-003"],
+      "recommendation_refs": ["REC-001", "REC-002"],
+      "status": "Open",
+      "workflow_state": "Reported",
+      "confidence": {
+        "level": "High",
+        "score": 0.9,
+        "rationale": "Supported by product capability review and policy analysis."
+      },
+      "domain_extension": {}
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E-001",
+      "title": "Biometric privacy legal basis",
+      "short_title": "BIPA reference",
+      "slug": "bipa-reference",
+      "type": "document",
+      "subtype": "legal_reference",
+      "domain": "risk_assessment",
+      "tags": ["legal", "privacy", "biometric"],
+      "content": {
+        "storage_type": "reference",
+        "uri": "evidence/legal/bipa_reference.pdf",
+        "excerpt": "Collection of biometric identifiers requires compliant notice and consent controls.",
+        "hash_sha256": null,
+        "mime_type": "application/pdf"
+      },
+      "source": {
+        "origin_type": "official_publication",
+        "origin_name": "Illinois legal authority",
+        "source_system": "Metis Upload",
+        "source_reference": null,
+        "url": null,
+        "publisher": "State authority",
+        "author": null
+      },
+      "collection": {
+        "collected_at": "2026-02-19T12:00:00Z",
+        "collected_by": "Metis-Agent-Legal-01",
+        "collection_method": "manual_review",
+        "jurisdiction": "US-IL",
+        "time_context": "current"
+      },
+      "trust": {
+        "source_reliability": "High",
+        "information_credibility": "High",
+        "confidence_score": 0.98,
+        "confidence_rationale": "Primary legal source."
+      },
+      "relationships": {
+        "supports_findings": ["F-001"],
+        "supports_risks": [],
+        "supports_recommendations": [],
+        "related_assets": ["AST-001"],
+        "related_controls": ["Consent Management"]
+      },
+      "handling": {
+        "classification": "Internal",
+        "contains_pii": false,
+        "contains_phi": false,
+        "contains_client_sensitive_data": false,
+        "distribution_restrictions": ["standard"]
+      },
+      "verification": {
+        "verified": true,
+        "verified_by": "Analyst",
+        "verified_at": "2026-02-19T12:30:00Z",
+        "reproducible": true,
+        "corroboration_count": 1
+      },
+      "domain_extension": {
+        "risk_assessment": {
+          "evidence_role": "regulatory_basis"
+        }
+      }
+    },
+    {
+      "id": "E-002",
+      "title": "Two-party consent legal analysis",
+      "type": "document",
+      "domain": "risk_assessment",
+      "content": { "storage_type": "reference", "uri": "evidence/legal/consent_analysis.pdf", "excerpt": "Certain states require all-party consent.", "hash_sha256": null, "mime_type": "application/pdf" },
+      "source": { "origin_type": "analysis", "origin_name": "Legal analysis package", "source_system": "Metis Upload", "source_reference": null, "url": null, "publisher": null, "author": "Analyst" },
+      "collection": { "collected_at": "2026-02-19T12:00:00Z", "collected_by": "Metis-Agent-Legal-01", "collection_method": "manual_review", "jurisdiction": "US", "time_context": "current" },
+      "trust": { "source_reliability": "High", "information_credibility": "High", "confidence_score": 0.94, "confidence_rationale": "Supported by statute review." },
+      "relationships": { "supports_findings": ["F-002"], "supports_risks": [], "supports_recommendations": [], "related_assets": [], "related_controls": [] },
+      "handling": { "classification": "Internal", "contains_pii": false, "contains_phi": false, "contains_client_sensitive_data": false, "distribution_restrictions": ["standard"] },
+      "verification": { "verified": true, "verified_by": "Analyst", "verified_at": "2026-02-19T12:30:00Z", "reproducible": true, "corroboration_count": 1 },
+      "domain_extension": {}
+    },
+    {
+      "id": "E-003",
+      "title": "Product capability and privacy behavior review",
+      "type": "document",
+      "domain": "risk_assessment",
+      "content": { "storage_type": "reference", "uri": "evidence/technical/product_capabilities.pdf", "excerpt": "Cloud upload and AI processing create direct governance concerns.", "hash_sha256": null, "mime_type": "application/pdf" },
+      "source": { "origin_type": "technical_review", "origin_name": "Capability review", "source_system": "Metis Upload", "source_reference": null, "url": null, "publisher": null, "author": "Analyst" },
+      "collection": { "collected_at": "2026-02-19T12:00:00Z", "collected_by": "Metis-Agent-Tech-01", "collection_method": "manual_review", "jurisdiction": "US", "time_context": "current" },
+      "trust": { "source_reliability": "High", "information_credibility": "High", "confidence_score": 0.91, "confidence_rationale": "Supported by product documentation review." },
+      "relationships": { "supports_findings": ["F-003"], "supports_risks": [], "supports_recommendations": ["REC-002"], "related_assets": ["AST-001"], "related_controls": ["Data Retention"] },
+      "handling": { "classification": "Internal", "contains_pii": false, "contains_phi": false, "contains_client_sensitive_data": false, "distribution_restrictions": ["standard"] },
+      "verification": { "verified": true, "verified_by": "Analyst", "verified_at": "2026-02-19T12:30:00Z", "reproducible": true, "corroboration_count": 1 },
+      "domain_extension": {}
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "REC-001",
+      "slug": "prohibit-meta-ai-glasses",
+      "title": "Implement Immediate Absolute Prohibition on Meta AI Glasses in Security Operations",
+      "short_title": "Prohibit Meta AI Glasses",
+      "category": "Governance",
+      "subcategory": "Policy and Enforcement",
+      "domain": "risk_assessment",
+      "tags": ["policy", "prohibition", "governance"],
+      "action": {
+        "type": "policy_change",
+        "description": "Prohibit employee use, possession, and operational deployment of Meta AI Glasses in work-related security contexts.",
+        "target_objects": [{ "type": "device_family", "name": "Meta AI Glasses" }]
+      },
+      "rationale": {
+        "summary": "The risk profile is not reasonably manageable through limited-use controls.",
+        "detailed_reasoning": "Absolute prohibition is the only durable way to materially reduce legal, reputational, and governance exposure."
+      },
+      "priority": "Critical",
+      "urgency": "Immediate",
+      "recommended_timeline": "0-1 days",
+      "implementation": {
+        "effort": "Medium",
+        "complexity": "Moderate",
+        "estimated_duration_days": 1,
+        "required_skills": ["Legal", "Operations", "HR"]
+      },
+      "ownership": {
+        "recommended_owner_role": "Executive Leadership",
+        "stakeholders": ["Legal", "HR", "Operations"]
+      },
+      "expected_outcome": {
+        "risk_reduction": "High",
+        "risk_addressed": ["F-001", "F-002", "F-003"],
+        "financial_exposure_reduction": "Significant",
+        "compliance_improvement": ["Privacy", "Recording consent"]
+      },
+      "relationships": {
+        "addresses_findings": ["F-001", "F-002", "F-003"],
+        "addresses_risks": [],
+        "related_controls": ["Acceptable Use Policy"],
+        "related_assets": ["AST-001"]
+      },
+      "implementation_guidance": {
+        "steps": [
+          "Issue executive directive",
+          "Update policy language",
+          "Communicate restrictions to personnel",
+          "Add enforcement and exception workflow"
+        ],
+        "dependencies": ["Legal review", "HR communication plan"],
+        "verification_method": "Confirm policy publication, acknowledgements, and enforcement process."
+      },
+      "tracking": {
+        "status": "Open",
+        "tracking_id": null,
+        "assigned_team": "Leadership / Legal",
+        "due_date": "2026-02-20",
+        "progress_percent": 0
+      },
+      "domain_extension": {
+        "risk_assessment": {
+          "financial_impact_reduction": "High",
+          "regulatory_risk_reduction": ["BIPA"]
+        }
+      }
+    },
+    {
+      "id": "REC-002",
+      "slug": "strengthen-data-handling-governance",
+      "title": "Strengthen Policy and Governance Around Wearable Recording Technology",
+      "short_title": "Strengthen Wearable Governance",
+      "category": "Data Governance",
+      "subcategory": "Third-Party Data Handling",
+      "domain": "risk_assessment",
+      "tags": ["data governance", "third-party", "wearables"],
+      "action": {
+        "type": "control_implementation",
+        "description": "Create governance controls covering recording devices, cloud upload behavior, client confidentiality exposure, and device restrictions.",
+        "target_objects": [{ "type": "policy_set", "name": "Wearable Device Governance" }]
+      },
+      "rationale": {
+        "summary": "Policy and enforcement controls are required even if prohibition is adopted.",
+        "detailed_reasoning": "Governance controls reduce recurrence risk and improve defensibility."
+      },
+      "priority": "High",
+      "urgency": "Short-term",
+      "recommended_timeline": "0-30 days",
+      "implementation": {
+        "effort": "Medium",
+        "complexity": "Moderate",
+        "estimated_duration_days": 14,
+        "required_skills": ["Legal", "Security Governance", "Operations"]
+      },
+      "ownership": {
+        "recommended_owner_role": "Security Governance",
+        "stakeholders": ["Legal", "Operations"]
+      },
+      "expected_outcome": {
+        "risk_reduction": "Medium",
+        "risk_addressed": ["F-003"],
+        "financial_exposure_reduction": "Moderate",
+        "compliance_improvement": ["Confidentiality", "Data retention"]
+      },
+      "relationships": {
+        "addresses_findings": ["F-003"],
+        "addresses_risks": [],
+        "related_controls": ["Data Retention", "Vendor Risk"],
+        "related_assets": ["AST-001"]
+      },
+      "implementation_guidance": {
+        "steps": [
+          "Define wearable device policy scope",
+          "Document prohibited capabilities",
+          "Establish exception handling and executive approval path"
+        ],
+        "dependencies": ["Leadership policy approval"],
+        "verification_method": "Review approved policy and supporting procedures."
+      },
+      "tracking": {
+        "status": "Open",
+        "tracking_id": null,
+        "assigned_team": "Security Governance",
+        "due_date": "2026-03-20",
+        "progress_percent": 0
+      },
+      "domain_extension": {}
+    }
+  ],
+  "visualizations": [
+    {
+      "id": "V-001",
+      "type": "kpi_cards",
+      "title": "Executive KPI Cards",
+      "data_source": "executive_summary.key_statistics",
+      "style_variant": "executive",
+      "placement": "executive_summary",
+      "options": {}
+    },
+    {
+      "id": "V-002",
+      "type": "severity_distribution",
+      "title": "Severity Distribution",
+      "data_source": "metrics.risk_distribution",
+      "style_variant": "executive",
+      "placement": "executive_summary",
+      "options": {}
+    },
+    {
+      "id": "V-003",
+      "type": "risk_matrix",
+      "title": "Risk Matrix",
+      "data_source": "risk_model.matrix",
+      "style_variant": "executive",
+      "placement": "risk_overview",
+      "options": {}
+    },
+    {
+      "id": "V-004",
+      "type": "financial_exposure_chart",
+      "title": "Financial Exposure by Scenario",
+      "data_source": "metrics.financial_exposure",
+      "style_variant": "executive",
+      "placement": "executive_summary",
+      "options": {}
+    },
+    {
+      "id": "V-005",
+      "type": "recommendation_priority",
+      "title": "Recommendation Priority",
+      "data_source": "recommendations",
+      "style_variant": "executive",
+      "placement": "recommendations",
+      "options": {}
+    }
+  ],
+  "appendices": [
+    {
+      "title": "Source Verification Log",
+      "content": "Placeholder appendix content for source verification log."
+    }
+  ]
+}

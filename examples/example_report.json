@@ -1,0 +1,206 @@
+{
+  "report": {
+    "id": "RPT-2026-001",
+    "title": "Meta AI Glasses Risk Assessment",
+    "type": "risk_assessment",
+    "client": "Signal Security",
+    "classification": "Confidential",
+    "version": "1.0",
+    "date_created": "2026-03-06",
+    "date_published": null,
+    "author": "Vistiqx",
+    "engagement_id": "ENG-2026-014"
+  },
+  "executive_summary": {
+    "overall_risk_rating": "High",
+    "summary_text": "The assessed deployment presents material legal, privacy, and operational risk and should not proceed without control changes."
+  },
+  "metrics": {
+    "risk_distribution": {
+      "critical": 1,
+      "high": 2,
+      "medium": 1,
+      "low": 0
+    },
+    "financial_exposure": {
+      "minimum": 100000000,
+      "maximum": 500000000
+    }
+  },
+  "risk_model": {
+    "scale": {
+      "likelihood": [1, 2, 3, 4, 5],
+      "impact": [1, 2, 3, 4, 5]
+    },
+    "matrix": [
+      {
+        "risk_id": "R-001",
+        "likelihood": 4,
+        "impact": 5,
+        "score": 20,
+        "severity": "Critical"
+      }
+    ]
+  },
+  "findings": [
+    {
+      "id": "F-001",
+      "slug": "unauthorized-biometric-capture",
+      "title": "Unauthorized Biometric Capture",
+      "short_title": "Biometric Capture Without Consent",
+      "domain": "risk_assessment",
+      "category": "Privacy",
+      "subcategory": "Biometric Data",
+      "finding_type": "risk",
+      "tags": ["privacy", "biometric", "legal"],
+      "severity": "Critical",
+      "priority": "Immediate",
+      "risk": {
+        "likelihood": 4,
+        "impact": 5,
+        "score": 20,
+        "rating": "Critical"
+      },
+      "summary": "The solution captures biometric identifiers without a sufficiently enforceable consent model.",
+      "description": "The assessed workflow allows processing of biometric data in environments where consent acquisition and revocation cannot be reliably demonstrated.",
+      "business_impact": "Potential legal, financial, and reputational exposure under biometric privacy laws.",
+      "technical_impact": "Insufficient enforcement and logging around biometric data handling.",
+      "affected_assets": [
+        {"id": "AST-001", "type": "device", "name": "Meta AI Glasses"}
+      ],
+      "affected_controls": ["Consent Management", "Audit Logging"],
+      "evidence_refs": ["E-001"],
+      "recommendation_refs": ["REC-001"],
+      "status": "Open",
+      "confidence": {"level": "High", "score": 0.89},
+      "domain_extension": {
+        "risk_assessment": {
+          "financial_exposure_min": 100000000,
+          "financial_exposure_max": 500000000,
+          "regulatory_exposure": ["BIPA"]
+        }
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E-001",
+      "title": "Illinois BIPA statutory reference",
+      "short_title": "BIPA statute",
+      "slug": "illinois-bipa-statutory-reference",
+      "type": "document",
+      "subtype": "legal_reference",
+      "domain": "risk_assessment",
+      "tags": ["legal", "privacy", "biometric"],
+      "content": {
+        "storage_type": "reference",
+        "uri": "evidence/legal/bipa_reference.pdf",
+        "excerpt": "A private entity may not collect biometric identifiers unless...",
+        "mime_type": "application/pdf"
+      },
+      "source": {
+        "origin_type": "official_publication",
+        "origin_name": "Illinois Compiled Statutes",
+        "publisher": "State of Illinois"
+      },
+      "collection": {
+        "collected_at": "2026-03-06T14:30:00Z",
+        "collected_by": "Metis-Agent-Legal-01",
+        "collection_method": "manual_review"
+      },
+      "trust": {
+        "source_reliability": "High",
+        "information_credibility": "High",
+        "confidence_score": 0.98
+      },
+      "relationships": {
+        "supports_findings": ["F-001"],
+        "supports_risks": ["R-001"]
+      },
+      "handling": {
+        "classification": "Internal",
+        "contains_pii": false,
+        "contains_client_sensitive_data": false
+      },
+      "verification": {
+        "verified": true,
+        "verified_by": "Analyst-RM",
+        "reproducible": true
+      },
+      "domain_extension": {
+        "risk_assessment": {
+          "evidence_role": "regulatory_basis",
+          "applicability_scope": ["Illinois operations"]
+        }
+      }
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "REC-001",
+      "slug": "disable-biometric-capture",
+      "title": "Disable Biometric Capture by Default",
+      "short_title": "Disable Biometric Capture",
+      "domain": "risk_assessment",
+      "category": "Privacy",
+      "subcategory": "Biometric Data Handling",
+      "tags": ["privacy", "biometric", "legal"],
+      "action": {
+        "type": "configuration_change",
+        "description": "Disable biometric capture features in the deployment profile."
+      },
+      "rationale": {
+        "summary": "Biometric identifiers require strict consent controls.",
+        "detailed_reasoning": "Disabling biometric capture eliminates a major legal exposure vector."
+      },
+      "priority": "Critical",
+      "urgency": "Immediate",
+      "recommended_timeline": "0-30 days",
+      "implementation": {
+        "effort": "Medium",
+        "complexity": "Moderate",
+        "estimated_duration_days": 14
+      },
+      "ownership": {
+        "recommended_owner_role": "Security Engineering",
+        "stakeholders": ["Legal", "Compliance"]
+      },
+      "expected_outcome": {
+        "risk_reduction": "High",
+        "risk_addressed": ["R-001"]
+      },
+      "relationships": {
+        "addresses_findings": ["F-001"],
+        "related_assets": ["AST-001"]
+      },
+      "implementation_guidance": {
+        "steps": [
+          "Disable biometric capture in configuration",
+          "Implement consent verification workflow",
+          "Add audit logging for biometric processing"
+        ]
+      },
+      "tracking": {
+        "status": "Open",
+        "assigned_team": "Security Engineering"
+      },
+      "domain_extension": {
+        "risk_assessment": {
+          "financial_impact_reduction": "High",
+          "regulatory_risk_reduction": ["BIPA"]
+        }
+      }
+    }
+  ],
+  "visualizations": [
+    {
+      "id": "V-001",
+      "type": "severity_distribution",
+      "title": "Severity Distribution",
+      "data_source": "metrics.risk_distribution",
+      "style_variant": "executive",
+      "config": null
+    }
+  ],
+  "appendices": []
+}

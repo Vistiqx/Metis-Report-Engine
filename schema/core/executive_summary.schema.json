@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/core/executive_summary.schema.json",
+  "title": "Executive Summary",
+  "type": "object",
+  "required": ["overall_risk_rating", "summary"],
+  "properties": {
+    "overall_risk_rating": { "type": "string" },
+    "summary": { "type": "string" },
+    "recommended_action": { "type": ["string", "null"] },
+    "timeline_for_action": { "type": ["string", "null"] },
+    "key_statistics": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "integer"]
+      }
+    },
+    "top_risks": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

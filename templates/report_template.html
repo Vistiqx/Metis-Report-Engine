@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ report.title }}</title>
+  <style>
+    body { font-family: Inter, Arial, sans-serif; margin: 40px; color: #121212; }
+    h1, h2, h3 { color: #4C3D75; }
+    .muted { color: #6E6E80; }
+    .card { border: 1px solid #E8E8F8; border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .metric { background: #E8E8F8; border-radius: 12px; padding: 12px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border: 1px solid #E8E8F8; padding: 10px; text-align: left; }
+    th { background: #F8F6FF; }
+    .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #AC8FFE; color: #121212; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>{{ report.title }}</h1>
+  <p class="muted">{{ report.client }} · {{ report.classification }} · v{{ report.version }}</p>
+
+  {% if executive_summary %}
+  <section class="card">
+    <h2>Executive Summary</h2>
+    <p><strong>Overall Risk:</strong> {{ executive_summary.overall_risk_rating }}</p>
+    <p>{{ executive_summary.summary_text }}</p>
+  </section>
+  {% endif %}
+
+  <section class="card">
+    <h2>Risk Distribution</h2>
+    <div class="grid">
+      <div class="metric"><strong>Critical</strong><div>{{ derived_metrics.critical if derived_metrics else metrics.risk_distribution.critical }}</div></div>
+      <div class="metric"><strong>High</strong><div>{{ derived_metrics.high if derived_metrics else metrics.risk_distribution.high }}</div></div>
+      <div class="metric"><strong>Medium</strong><div>{{ derived_metrics.medium if derived_metrics else metrics.risk_distribution.medium }}</div></div>
+      <div class="metric"><strong>Low</strong><div>{{ derived_metrics.low if derived_metrics else metrics.risk_distribution.low }}</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Findings</h2>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Title</th><th>Severity</th><th>Summary</th></tr>
+      </thead>
+      <tbody>
+      {% for finding in findings %}
+        <tr>
+          <td>{{ finding.id }}</td>
+          <td>{{ finding.title }}</td>
+          <td><span class="pill">{{ finding.severity }}</span></td>
+          <td>{{ finding.summary }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Recommendations</h2>
+    {% for recommendation in recommendations %}
+      <div style="margin-bottom:12px;">
+        <strong>{{ recommendation.id }} — {{ recommendation.title }}</strong><br>
+        <span class="muted">Priority: {{ recommendation.priority }}</span>
+      </div>
+    {% endfor %}
+  </section>
+</body>
+</html>

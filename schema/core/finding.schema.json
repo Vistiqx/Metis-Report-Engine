@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/core/finding.schema.json",
+  "title": "Finding",
+  "type": "object",
+  "required": ["id", "title", "domain", "category", "severity", "summary"],
+  "properties": {
+    "id": { "type": "string" },
+    "slug": { "type": ["string", "null"] },
+    "title": { "type": "string" },
+    "short_title": { "type": ["string", "null"] },
+    "domain": { "type": "string" },
+    "category": { "type": "string" },
+    "subcategory": { "type": ["string", "null"] },
+    "finding_type": { "type": ["string", "null"] },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "severity": { "type": "string" },
+    "risk": {
+      "type": "object",
+      "properties": {
+        "likelihood": { "type": ["integer", "null"] },
+        "impact": { "type": ["integer", "null"] },
+        "score": { "type": ["integer", "number", "null"] },
+        "rating": { "type": ["string", "null"] }
+      }
+    },
+    "priority": { "type": ["string", "null"] },
+    "summary": { "type": "string" },
+    "description": { "type": ["string", "null"] },
+    "business_impact": { "type": ["string", "null"] },
+    "technical_impact": { "type": ["string", "null"] },
+    "affected_assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": ["string", "null"] },
+          "type": { "type": ["string", "null"] },
+          "name": { "type": "string" }
+        },
+        "required": ["name"]
+      }
+    },
+    "affected_business_units": { "type": "array", "items": { "type": "string" } },
+    "affected_data_types": { "type": "array", "items": { "type": "string" } },
+    "affected_controls": { "type": "array", "items": { "type": "string" } },
+    "evidence_refs": { "type": "array", "items": { "type": "string" } },
+    "recommendation_refs": { "type": "array", "items": { "type": "string" } },
+    "status": { "type": ["string", "null"] },
+    "workflow_state": { "type": ["string", "null"] },
+    "confidence": {
+      "type": "object",
+      "properties": {
+        "level": { "type": ["string", "null"] },
+        "score": { "type": ["number", "null"] },
+        "rationale": { "type": ["string", "null"] }
+      }
+    },
+    "domain_extension": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

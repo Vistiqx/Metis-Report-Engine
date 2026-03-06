@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/core/evidence.schema.json",
+  "title": "Evidence",
+  "type": "object",
+  "required": ["id", "title", "type", "domain"],
+  "properties": {
+    "id": { "type": "string" },
+    "title": { "type": "string" },
+    "short_title": { "type": ["string", "null"] },
+    "slug": { "type": ["string", "null"] },
+    "type": { "type": "string" },
+    "subtype": { "type": ["string", "null"] },
+    "domain": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "content": {
+      "type": "object",
+      "properties": {
+        "storage_type": { "type": ["string", "null"] },
+        "uri": { "type": ["string", "null"] },
+        "excerpt": { "type": ["string", "null"] },
+        "hash_sha256": { "type": ["string", "null"] },
+        "mime_type": { "type": ["string", "null"] }
+      }
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "origin_type": { "type": ["string", "null"] },
+        "origin_name": { "type": ["string", "null"] },
+        "source_system": { "type": ["string", "null"] },
+        "source_reference": { "type": ["string", "null"] },
+        "url": { "type": ["string", "null"] },
+        "publisher": { "type": ["string", "null"] },
+        "author": { "type": ["string", "null"] }
+      }
+    },
+    "collection": {
+      "type": "object",
+      "properties": {
+        "collected_at": { "type": ["string", "null"], "format": "date-time" },
+        "collected_by": { "type": ["string", "null"] },
+        "collection_method": { "type": ["string", "null"] },
+        "jurisdiction": { "type": ["string", "null"] },
+        "time_context": { "type": ["string", "null"] }
+      }
+    },
+    "trust": {
+      "type": "object",
+      "properties": {
+        "source_reliability": { "type": ["string", "null"] },
+        "information_credibility": { "type": ["string", "null"] },
+        "confidence_score": { "type": ["number", "null"] },
+        "confidence_rationale": { "type": ["string", "null"] }
+      }
+    },
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "supports_findings": { "type": "array", "items": { "type": "string" } },
+        "supports_risks": { "type": "array", "items": { "type": "string" } },
+        "supports_recommendations": { "type": "array", "items": { "type": "string" } },
+        "related_assets": { "type": "array", "items": { "type": "string" } },
+        "related_controls": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "handling": {
+      "type": "object",
+      "properties": {
+        "classification": { "type": ["string", "null"] },
+        "contains_pii": { "type": ["boolean", "null"] },
+        "contains_phi": { "type": ["boolean", "null"] },
+        "contains_client_sensitive_data": { "type": ["boolean", "null"] },
+        "distribution_restrictions": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "properties": {
+        "verified": { "type": ["boolean", "null"] },
+        "verified_by": { "type": ["string", "null"] },
+        "verified_at": { "type": ["string", "null"], "format": "date-time" },
+        "reproducible": { "type": ["boolean", "null"] },
+        "corroboration_count": { "type": ["integer", "null"] }
+      }
+    },
+    "domain_extension": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}
