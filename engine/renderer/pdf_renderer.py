@@ -71,7 +71,6 @@ def render_pdf_from_html(
                 landscape=landscape,
                 margin=margin,
                 print_background=print_background,
-                timeout=timeout,
             )
             
             browser.close()
