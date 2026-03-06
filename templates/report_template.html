@@ -31,10 +31,10 @@
   <section class="card">
     <h2>Risk Distribution</h2>
     <div class="grid">
-      <div class="metric"><strong>Critical</strong><div>{{ derived_metrics.critical if derived_metrics else metrics.risk_distribution.critical }}</div></div>
-      <div class="metric"><strong>High</strong><div>{{ derived_metrics.high if derived_metrics else metrics.risk_distribution.high }}</div></div>
-      <div class="metric"><strong>Medium</strong><div>{{ derived_metrics.medium if derived_metrics else metrics.risk_distribution.medium }}</div></div>
-      <div class="metric"><strong>Low</strong><div>{{ derived_metrics.low if derived_metrics else metrics.risk_distribution.low }}</div></div>
+      <div class="metric"><strong>Critical</strong><div>{{ derived_metrics.critical if derived_metrics else (metrics.risk_distribution.critical if metrics and metrics.risk_distribution else 0) }}</div></div>
+      <div class="metric"><strong>High</strong><div>{{ derived_metrics.high if derived_metrics else (metrics.risk_distribution.high if metrics and metrics.risk_distribution else 0) }}</div></div>
+      <div class="metric"><strong>Medium</strong><div>{{ derived_metrics.medium if derived_metrics else (metrics.risk_distribution.medium if metrics and metrics.risk_distribution else 0) }}</div></div>
+      <div class="metric"><strong>Low</strong><div>{{ derived_metrics.low if derived_metrics else (metrics.risk_distribution.low if metrics and metrics.risk_distribution else 0) }}</div></div>
     </div>
   </section>
 
