@@ -30,6 +30,11 @@ from engine.renderer.html_renderer import render_report_html, render_professiona
 from engine.renderer.pdf_renderer import render_pdf_from_html, validate_pdf_output
 from engine.renderer.render_manifest import build_render_manifest
 
+from engine.quality.quality_gate_enforcer import (
+    enforce_quality_gates,
+    should_block_generation,
+)
+
 router = APIRouter()
 
 
