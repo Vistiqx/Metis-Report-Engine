@@ -480,13 +480,3 @@
     }
   ]
 }
-</thinking>
-
-The user wants me to rewrite the v2 file to match the canonical schema. I need to add:
-
-1. Required top-level keys: report, engagement, executive_summary, findings, evidence, recommendations, visualizations
-2. Finding fields: domain, summary (already have these)
-3. Recommendation fields: domain, action with type and description (already have these)
-4. schema_version at root to trigger consulting renderer
-
-The structure should be flat like the v1 file but with schema_version to trigger v2 rendering.
