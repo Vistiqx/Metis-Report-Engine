@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ report.metadata.title }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2.5cm 2cm;
+            @bottom-center {
+                content: counter(page);
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        @page :first {
+            @bottom-center {
+                content: none;
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: white;
+        }
+        
+        /* Cover Page */
+        .cover-page {
+            page-break-after: always;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 3cm 2cm;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 8px solid {{ colors.primary }};
+        }
+        
+        .cover-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .consultant-logo {
+            max-width: 180px;
+            height: auto;
+        }
+        
+        .classification-badge {
+            padding: 8px 20px;
+            background: {{ colors.primary }};
+            color: white;
+            font-weight: bold;
+            font-size: 10pt;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .cover-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .cover-title {
+            font-size: 32pt;
+            font-weight: 300;
+            color: {{ colors.primary }};
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+        
+        .cover-subtitle {
+            font-size: 16pt;
+            color: #666;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+        
+        .cover-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #ddd;
+        }
+        
+        .meta-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .meta-label {
+            font-size: 9pt;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        
+        .meta-value {
+            font-size: 12pt;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .cover-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 30px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .client-info {
+            text-align: right;
+        }
+        
+        /* Table of Contents */
+        .toc-page {
+            page-break-after: always;
+            padding: 2cm 0;
+        }
+        
+        .toc-title {
+            font-size: 24pt;
+            font-weight: 300;
+            color: {{ colors.primary }};
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid {{ colors.primary }};
+        }
+        
+        .toc-list {
+            list-style: none;
+        }
+        
+        .toc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 12px 0;
+            border-bottom: 1px dotted #ddd;
+        }
+        
+        .toc-item:first-child {
+            border-top: 1px dotted #ddd;
+        }
+        
+        .toc-number {
+            font-weight: 600;
+            color: {{ colors.primary }};
+            margin-right: 10px;
+        }
+        
+        .toc-text {
+            flex: 1;
+        }
+        
+        .toc-page-num {
+            color: #666;
+            font-size: 10pt;
+        }
+        
+        /* Executive Summary Box */
+        .executive-summary {
+            page-break-after: always;
+            background: #f8f9fa;
+            padding: 30px;
+            margin: 20px 0;
+            border-left: 4px solid {{ colors.primary }};
+        }
+        
+        .exec-summary-title {
+            font-size: 20pt;
+            font-weight: 300;
+            color: {{ colors.primary }};
+            margin-bottom: 20px;
+        }
+        
+        .overall-rating {
+            display: inline-block;
+            padding: 10px 25px;
+            font-size: 14pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px 0;
+            background: {{ colors.critical }};
+            color: white;
+        }
+        
+        .key-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .metric-box {
+            background: white;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 24pt;
+            font-weight: bold;
+            color: {{ colors.primary }};
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 9pt;
+            text-transform: uppercase;
+            color: #666;
+            letter-spacing: 1px;
+        }
+        
+        /* Section Styling */
+        .section {
+            page-break-before: always;
+            margin-top: 0;
+        }
+        
+        .section:first-of-type {
+            page-break-before: auto;
+        }
+        
+        .section-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid {{ colors.primary }};
+        }
+        
+        .section-number {
+            font-size: 12pt;
+            font-weight: 600;
+            color: {{ colors.primary }};
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .section-title {
+            font-size: 22pt;
+            font-weight: 300;
+            color: #2c3e50;
+            line-height: 1.3;
+        }
+        
+        .section-summary {
+            font-size: 12pt;
+            color: #666;
+            font-style: italic;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 3px solid #ddd;
+        }
+        
+        /* Content Blocks */
+        .content-block {
+            margin: 25px 0;
+        }
+        
+        .paragraph {
+            text-align: justify;
+            margin: 15px 0;
+        }
+        
+        .bullet-list {
+            list-style: none;
+            padding-left: 20px;
+        }
+        
+        .bullet-list li {
+            position: relative;
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        
+        .bullet-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: {{ colors.primary }};
+            font-weight: bold;
+        }
+        
+        .numbered-list {
+            list-style: decimal;
+            padding-left: 30px;
+        }
+        
+        .numbered-list li {
+            margin: 10px 0;
+            padding-left: 10px;
+        }
+        
+        /* Tables */
+        .table-container {
+            margin: 25px 0;
+            overflow-x: auto;
+        }
+        
+        .table-title {
+            font-size: 11pt;
+            font-weight: 600;
+            color: {{ colors.primary }};
+            margin-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+        }
+        
+        thead {
+            background: {{ colors.primary }};
+            color: white;
+        }
+        
+        th {
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 9pt;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        tr:hover {
+            background: #e3f2fd;
+        }
+        
+        /* Callouts */
+        .callout {
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid;
+        }
+        
+        .callout-info {
+            background: #e3f2fd;
+            border-color: #2196F3;
+        }
+        
+        .callout-warning {
+            background: #fff3e0;
+            border-color: #FF9800;
+        }
+        
+        .callout-critical {
+            background: #ffebee;
+            border-color: #f44336;
+        }
+        
+        .callout-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 11pt;
+        }
+        
+        /* Charts */
+        .chart-container {
+            margin: 30px 0;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        
+        .chart-title {
+            font-size: 12pt;
+            font-weight: 600;
+            color: {{ colors.primary }};
+            margin-bottom: 15px;
+        }
+        
+        .chart-svg {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Findings */
+        .finding {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 4px solid {{ colors.critical }};
+            page-break-inside: avoid;
+        }
+        
+        .finding-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .finding-id {
+            font-weight: bold;
+            color: {{ colors.primary }};
+            font-size: 10pt;
+        }
+        
+        .finding-severity {
+            padding: 5px 15px;
+            font-size: 9pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: white;
+            background: {{ colors.critical }};
+        }
+        
+        .finding-title {
+            font-size: 13pt;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .finding-description {
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .finding-meta {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 9pt;
+            color: #666;
+        }
+        
+        /* Recommendations */
+        .recommendation {
+            margin: 20px 0;
+            padding: 20px;
+            background: #e8f5e9;
+            border-left: 4px solid {{ colors.low }};
+            page-break-inside: avoid;
+        }
+        
+        .rec-priority {
+            padding: 5px 15px;
+            font-size: 9pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: white;
+            background: {{ colors.high }};
+        }
+        
+        /* Appendices */
+        .appendix {
+            page-break-before: always;
+        }
+        
+        .appendix-title {
+            font-size: 14pt;
+            font-weight: 600;
+            color: {{ colors.primary }};
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        /* Typography */
+        h1 { font-size: 24pt; font-weight: 300; color: {{ colors.primary }}; margin: 30px 0 20px; }
+        h2 { font-size: 18pt; font-weight: 400; color: #333; margin: 25px 0 15px; }
+        h3 { font-size: 14pt; font-weight: 600; color: #444; margin: 20px 0 10px; }
+        
+        strong { font-weight: 600; color: #2c3e50; }
+        em { font-style: italic; color: #555; }
+        
+        /* Page breaks */
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <div class="cover-header">
+            <div class="consultant-info">
+                {% if report.metadata.consultant and report.metadata.consultant.logo_url %}
+                <img src="{{ report.metadata.consultant.logo_url }}" alt="Consultant Logo" class="consultant-logo">
+                {% else %}
+                <div style="font-size: 24pt; font-weight: 300; color: {{ colors.primary }};">
+                    {{ report.metadata.consultant.firm if report.metadata.consultant else "Vistiqx" }}
+                </div>
+                {% endif %}
+            </div>
+            <div class="classification-badge">
+                {{ report.metadata.classification | default("Confidential") }}
+            </div>
+        </div>
+        
+        <div class="cover-content">
+            <h1 class="cover-title">{{ report.metadata.title }}</h1>
+            {% if report.metadata.subtitle %}
+            <p class="cover-subtitle">{{ report.metadata.subtitle }}</p>
+            {% endif %}
+            
+            <div class="cover-meta">
+                <div class="meta-group">
+                    <span class="meta-label">Report ID</span>
+                    <span class="meta-value">{{ report.metadata.id }}</span>
+                </div>
+                <div class="meta-group">
+                    <span class="meta-label">Version</span>
+                    <span class="meta-value">{{ report.metadata.version }}</span>
+                </div>
+                <div class="meta-group">
+                    <span class="meta-label">Date</span>
+                    <span class="meta-value">{{ report.metadata.date_published | default(report.metadata.date_created) }}</span>
+                </div>
+                <div class="meta-group">
+                    <span class="meta-label">Type</span>
+                    <span class="meta-value">{{ report.metadata.type | replace('_', ' ') | title }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="cover-footer">
+            <div class="consultant-contact">
+                {% if report.metadata.consultant %}
+                <strong>{{ report.metadata.consultant.name }}</strong><br>
+                {{ report.metadata.consultant.contact | default("") }}
+                {% endif %}
+            </div>
+            <div class="client-info">
+                <span class="meta-label">Prepared For</span><br>
+                <strong>{{ report.metadata.client.name if report.metadata.client else report.metadata.client | default("Client Organization") }}</strong><br>
+                {{ report.metadata.client.organization if report.metadata.client else "" }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc-page">
+        <h2 class="toc-title">Table of Contents</h2>
+        <ul class="toc-list">
+            {% if report.executive_summary %}
+            <li class="toc-item">
+                <span class="toc-text">Executive Summary</span>
+                <span class="toc-page-num"></span>
+            </li>
+            {% endif %}
+            
+            {% for section in report.sections %}
+            {% if section.show_in_toc %}
+            <li class="toc-item">
+                <span class="toc-text">{{ loop.index }}. {{ section.title }}</span>
+                <span class="toc-page-num"></span>
+            </li>
+            {% endif %}
+            {% endfor %}
+            
+            {% if report.findings and report.findings | length > 0 %}
+            <li class="toc-item">
+                <span class="toc-text">Findings</span>
+                <span class="toc-page-num"></span>
+            </li>
+            {% endif %}
+            
+            {% if report.recommendations and report.recommendations | length > 0 %}
+            <li class="toc-item">
+                <span class="toc-text">Recommendations</span>
+                <span class="toc-page-num"></span>
+            </li>
+            {% endif %}
+            
+            {% if report.appendices and report.appendices | length > 0 %}
+            <li class="toc-item">
+                <span class="toc-text">Appendices</span>
+                <span class="toc-page-num"></span>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Executive Summary -->
+    {% if report.executive_summary %}
+    <div class="executive-summary">
+        <h2 class="exec-summary-title">Executive Summary</h2>
+        
+        {% if report.executive_summary.overall_risk_rating %}
+        <div class="overall-rating">
+            Overall Risk: {{ report.executive_summary.overall_risk_rating }}
+        </div>
+        {% endif %}
+        
+        {% if report.executive_summary.summary %}
+        <p class="paragraph">{{ report.executive_summary.summary }}</p>
+        {% endif %}
+        
+        {% if report.executive_summary.key_findings %}
+        <h3>Key Findings</h3>
+        <ul class="bullet-list">
+            {% for finding in report.executive_summary.key_findings %}
+            <li>{{ finding }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        
+        {% if report.executive_summary.business_impact %}
+        <div class="callout callout-critical">
+            <div class="callout-title">Business Impact</div>
+            <p>{{ report.executive_summary.business_impact }}</p>
+        </div>
+        {% endif %}
+        
+        {% if report.executive_summary.recommended_actions %}
+        <div class="callout callout-warning">
+            <div class="callout-title">Recommended Actions</div>
+            <p>{{ report.executive_summary.recommended_actions }}</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Main Sections -->
+    {% for section in report.sections %}
+    <div class="section" id="section-{{ section.id }}">
+        <div class="section-header">
+            <div class="section-number">Section {{ loop.index }}</div>
+            <h2 class="section-title">{{ section.title }}</h2>
+            {% if section.summary %}
+            <p class="section-summary">{{ section.summary }}</p>
+            {% endif %}
+        </div>
+        
+        {% for block in section.blocks %}
+        <div class="content-block">
+            {% if block.type == 'paragraph' %}
+                <p class="paragraph">{{ block.text }}</p>
+            
+            {% elif block.type == 'bullet_list' %}
+                <ul class="bullet-list">
+                    {% for item in block.items %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            
+            {% elif block.type == 'numbered_list' %}
+                <ol class="numbered-list">
+                    {% for item in block.items %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ol>
+            
+            {% elif block.type == 'table' and block.table %}
+                <div class="table-container">
+                    {% if block.title %}<div class="table-title">{{ block.title }}</div>{% endif %}
+                    <table>
+                        <thead>
+                            <tr>
+                                {% for header in block.table.headers %}
+                                <th>{{ header }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in block.table.rows %}
+                            <tr>
+                                {% for cell in row %}
+                                <td>{{ cell }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            
+            {% elif block.type == 'chart' and block.chart %}
+                <div class="chart-container">
+                    {% if block.title %}<div class="chart-title">{{ block.title }}</div>{% endif %}
+                    {% if block.chart.svg_data %}
+                    <img src="data:image/svg+xml;base64,{{ block.chart.svg_data }}" 
+                         alt="{{ block.chart.title | default('Chart') }}" 
+                         class="chart-svg">
+                    {% endif %}
+                </div>
+            
+            {% elif block.type == 'callout' and block.callout %}
+                <div class="callout callout-{{ block.callout.type | default('info') }}">
+                    {% if block.callout.title %}<div class="callout-title">{{ block.callout.title }}</div>{% endif %}
+                    <p>{{ block.callout.content }}</p>
+                </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    <!-- Findings -->
+    {% if report.findings and report.findings | length > 0 %}
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Findings</div>
+            <h2 class="section-title">Risk Findings</h2>
+        </div>
+        
+        {% for finding in report.findings %}
+        <div class="finding">
+            <div class="finding-header">
+                <span class="finding-id">{{ finding.id }}</span>
+                <span class="finding-severity">{{ finding.severity }}</span>
+            </div>
+            <h3 class="finding-title">{{ finding.title }}</h3>
+            <p class="finding-description">{{ finding.description }}</p>
+            <div class="finding-meta">
+                <span><strong>Category:</strong> {{ finding.category }}</span>
+                <span><strong>Likelihood:</strong> {{ finding.likelihood }}/5</span>
+                <span><strong>Impact:</strong> {{ finding.impact }}/5</span>
+                {% if finding.risk_score %}<span><strong>Risk Score:</strong> {{ finding.risk_score }}</span>{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Recommendations -->
+    {% if report.recommendations and report.recommendations | length > 0 %}
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Recommendations</div>
+            <h2 class="section-title">Strategic Recommendations</h2>
+        </div>
+        
+        {% for rec in report.recommendations %}
+        <div class="recommendation">
+            <div class="finding-header">
+                <span class="finding-id">{{ rec.id }}</span>
+                <span class="rec-priority">{{ rec.priority }}</span>
+            </div>
+            <h3 class="finding-title">{{ rec.title }}</h3>
+            <p class="finding-description">{{ rec.description }}</p>
+            {% if rec.timeline %}
+            <div class="finding-meta">
+                <span><strong>Timeline:</strong> {{ rec.timeline }}</span>
+                {% if rec.effort %}<span><strong>Effort:</strong> {{ rec.effort }}</span>{% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Appendices -->
+    {% if report.appendices and report.appendices | length > 0 %}
+    {% for appendix in report.appendices %}
+    <div class="appendix">
+        <h2 class="appendix-title">Appendix {{ loop.index }}: {{ appendix.title }}</h2>
+        
+        {% if appendix.content %}
+        <p class="paragraph">{{ appendix.content }}</p>
+        {% endif %}
+        
+        {% for block in appendix.blocks %}
+        <div class="content-block">
+            {% if block.type == 'paragraph' %}
+                <p class="paragraph">{{ block.text }}</p>
+            {% elif block.type == 'table' and block.table %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                {% for header in block.table.headers %}
+                                <th>{{ header }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in block.table.rows %}
+                            <tr>
+                                {% for cell in row %}
+                                <td>{{ cell }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+    {% endif %}
+</body>
+</html>

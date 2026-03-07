@@ -1,0 +1,372 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metis://schemas/v2/canonical_report.schema.json",
+  "title": "Metis Canonical Report v2",
+  "description": "Schema for consulting-grade risk assessment reports",
+  "type": "object",
+  "required": ["schema_version", "report"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["2.0"],
+      "description": "Schema version identifier"
+    },
+    "report": {
+      "type": "object",
+      "required": ["metadata", "sections"],
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/ReportMetadata"
+        },
+        "executive_summary": {
+          "$ref": "#/definitions/ExecutiveSummary"
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Section"
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Finding"
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Recommendation"
+          }
+        },
+        "risk_matrix": {
+          "$ref": "#/definitions/RiskMatrix"
+        },
+        "visualizations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Visualization"
+          }
+        },
+        "appendices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Appendix"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ReportMetadata": {
+      "type": "object",
+      "required": ["id", "title", "type", "version", "date_created"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "type": { 
+          "type": "string",
+          "enum": ["risk_assessment", "security_assessment", "compliance_assessment", "penetration_test"]
+        },
+        "classification": { 
+          "type": "string",
+          "enum": ["Public", "Internal", "Confidential", "Restricted"]
+        },
+        "client": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "organization": { "type": "string" },
+            "logo_url": { "type": "string" }
+          }
+        },
+        "consultant": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "firm": { "type": "string" },
+            "logo_url": { "type": "string" },
+            "contact": { "type": "string" }
+          }
+        },
+        "version": { "type": "string" },
+        "date_created": { "type": "string", "format": "date" },
+        "date_published": { "type": "string", "format": "date" },
+        "review_cycle": { "type": "string" }
+      }
+    },
+    "ExecutiveSummary": {
+      "type": "object",
+      "properties": {
+        "overall_risk_rating": { 
+          "type": "string",
+          "enum": ["Critical", "High", "Moderate", "Low", "Minimal"]
+        },
+        "summary": { "type": "string" },
+        "key_findings": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "business_impact": { "type": "string" },
+        "recommended_actions": { "type": "string" },
+        "risk_score": { "type": "number" }
+      }
+    },
+    "Section": {
+      "type": "object",
+      "required": ["id", "title", "type"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "type": { 
+          "type": "string",
+          "enum": ["introduction", "methodology", "technology_overview", "problem_statement", 
+                   "risk_analysis", "comparative_analysis", "financial_exposure", 
+                   "recommendations", "risk_of_inaction", "conclusion", "appendix"]
+        },
+        "summary": { "type": "string" },
+        "order": { "type": "integer" },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ContentBlock"
+          }
+        },
+        "show_in_toc": { "type": "boolean", "default": true }
+      }
+    },
+    "ContentBlock": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { 
+          "type": "string",
+          "enum": ["paragraph", "bullet_list", "numbered_list", "table", 
+                   "chart", "matrix", "callout", "image", "key_metrics"]
+        },
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "text": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "table": {
+          "$ref": "#/definitions/TableBlock"
+        },
+        "chart": {
+          "$ref": "#/definitions/ChartBlock"
+        },
+        "matrix": {
+          "$ref": "#/definitions/MatrixBlock"
+        },
+        "callout": {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string", "enum": ["info", "warning", "critical", "success"] },
+            "title": { "type": "string" },
+            "content": { "type": "string" }
+          }
+        }
+      }
+    },
+    "TableBlock": {
+      "type": "object",
+      "required": ["headers", "rows"],
+      "properties": {
+        "headers": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "caption": { "type": "string" },
+        "column_alignments": {
+          "type": "array",
+          "items": { 
+            "type": "string",
+            "enum": ["left", "center", "right"]
+          }
+        }
+      }
+    },
+    "ChartBlock": {
+      "type": "object",
+      "required": ["chart_type", "data"],
+      "properties": {
+        "chart_type": { 
+          "type": "string",
+          "enum": ["donut", "bar", "horizontal_bar", "radar", "line", "heatmap", "matrix"]
+        },
+        "title": { "type": "string" },
+        "data": { "type": "object" },
+        "labels": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "colors": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "options": { "type": "object" }
+      }
+    },
+    "MatrixBlock": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["risk_matrix"] },
+        "x_axis": {
+          "type": "object",
+          "properties": {
+            "label": { "type": "string" },
+            "min": { "type": "integer" },
+            "max": { "type": "integer" },
+            "labels": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "y_axis": {
+          "type": "object",
+          "properties": {
+            "label": { "type": "string" },
+            "min": { "type": "integer" },
+            "max": { "type": "integer" },
+            "labels": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "zones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": { "type": "string" },
+              "color": { "type": "string" },
+              "x_range": { "type": "array", "items": { "type": "integer" } },
+              "y_range": { "type": "array", "items": { "type": "integer" } }
+            }
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" },
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "color": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "Finding": {
+      "type": "object",
+      "required": ["id", "title", "severity", "category"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "severity": { 
+          "type": "string",
+          "enum": ["Critical", "High", "Moderate", "Low", "Informational"]
+        },
+        "category": { "type": "string" },
+        "subcategory": { "type": "string" },
+        "likelihood": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "impact": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "risk_score": { "type": "number" },
+        "affected_assets": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "evidence": { "type": "string" },
+        "recommendation_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "Recommendation": {
+      "type": "object",
+      "required": ["id", "title", "priority"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "priority": { 
+          "type": "string",
+          "enum": ["Critical", "High", "Medium", "Low"]
+        },
+        "effort": { 
+          "type": "string",
+          "enum": ["Low", "Medium", "High"]
+        },
+        "timeline": { "type": "string" },
+        "finding_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "resources_required": { "type": "string" },
+        "implementation_steps": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "RiskMatrix": {
+      "type": "object",
+      "properties": {
+        "scale": { "type": "integer", "default": 5 },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "likelihood": { "type": "integer" },
+              "impact": { "type": "integer" },
+              "severity": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "Visualization": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { 
+          "type": "string",
+          "enum": ["risk_distribution", "financial_exposure", "risk_matrix", 
+                   "comparative_radar", "timeline", "kpi_summary"]
+        },
+        "title": { "type": "string" },
+        "data_source": { "type": "string" },
+        "config": { "type": "object" }
+      }
+    },
+    "Appendix": {
+      "type": "object",
+      "required": ["id", "title"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ContentBlock"
+          }
+        }
+      }
+    }
+  }
+}
