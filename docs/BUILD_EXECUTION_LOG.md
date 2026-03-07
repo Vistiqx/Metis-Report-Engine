@@ -102,7 +102,20 @@ After fixing the API payload handling issue, verified that the canonical report 
 
 No fixture changes required. The Meta AI Glasses risk assessment fixture was already properly aligned with the schema. The earlier validation failures were solely due to the API payload handling bug (fixed in commit 49dbac0), not fixture/schema misalignment.
 
-**Action Required:** None. Run PowerShell test script to verify end-to-end workflow.
+### Production-Shape Testing Added
+
+**New Files:**
+- `tests/test_production_shape.py` - 10 tests documenting schema requirements and testing production payloads
+- `scripts/diagnose_production_test.py` - Diagnostic tool to verify end-to-end workflow
+
+**Test Coverage:**
+- ✅ Wrapped payload validation (production shape: `{"report": {...}}`)
+- ✅ Quality gates with wrapped payload
+- ✅ Direct canonical validation
+- ✅ Schema field requirements for all entity types
+- ✅ Visualization enum validation
+
+**All 10 production-shape tests: PASS**
 
 ---
 
