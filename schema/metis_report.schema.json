@@ -3,10 +3,11 @@
   "$id": "metis/metis_report.schema.json",
   "title": "MetisReport",
   "type": "object",
-  "required": ["report", "findings", "evidence", "recommendations"],
+  "required": ["report", "engagement", "executive_summary", "findings", "evidence", "recommendations", "visualizations"],
   "properties": {
-    "report": {"$ref": "./core/report.schema.json"},
-    "executive_summary": {"type": ["object", "null"]},
+    "report": {"$ref": "./core/report_metadata.schema.json"},
+    "engagement": {"$ref": "./core/engagement.schema.json"},
+    "executive_summary": {"$ref": "./core/executive_summary.schema.json"},
     "metrics": {"$ref": "./core/metrics.schema.json"},
     "risk_model": {"$ref": "./core/risk_model.schema.json"},
     "findings": {
@@ -27,7 +28,14 @@
     },
     "appendices": {
       "type": "array",
-      "items": {"type": "object"}
+      "items": {
+        "type": "object",
+        "required": ["title", "content"],
+        "properties": {
+          "title": {"type": "string"},
+          "content": {"type": "string"}
+        }
+      }
     }
   },
   "additionalProperties": true

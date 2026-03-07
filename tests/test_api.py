@@ -1,6 +1,8 @@
 """Tests for API routes."""
 
+import json
 import pytest
+from pathlib import Path
 from fastapi.testclient import TestClient
 from main import app
 
@@ -178,3 +180,166 @@ class TestGenerateReport:
         response = client.post("/generate-report", params={"report_path": "/nonexistent/file.json"})
         
         assert response.status_code == 404
+
+
+class TestWrappedPayloadHandling:
+    """Regression tests for wrapped payload handling (GitHub issue fix).
+    
+    These tests verify that API endpoints correctly handle both:
+    - Wrapped payloads: {"report": <canonical report>}
+    - Direct payloads: <canonical report>
+    
+    Issue: API was validating wrapper instead of canonical report,
+    causing false validation errors like "'findings' is a required property"
+    when the canonical report actually contained findings.
+    """
+    
+    def _load_real_report(self):
+        """Load the Meta AI Glasses risk assessment report fixture."""
+        fixture_path = Path(__file__).parents[1] / "examples" / "reports" / "meta-ai-glasses-risk-assessment.example.json"
+        return json.loads(fixture_path.read_text())
+    
+    def test_validate_report_with_wrapped_payload(self):
+        """Wrapped payload validation should pass for valid real report."""
+        report = self._load_real_report()
+        wrapped_payload = {"report": report}
+        
+        response = client.post("/validate-report-json", json=wrapped_payload)
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["valid"] is True, f"Validation failed: {data.get('error', {}).get('message', '')}"
+        assert data["status"] == "passed"
+    
+    def test_validate_report_with_direct_payload(self):
+        """Direct canonical JSON validation should still work."""
+        report = self._load_real_report()
+        
+        response = client.post("/validate-report-json", json=report)
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["valid"] is True, f"Validation failed: {data.get('error', {}).get('message', '')}"
+        assert data["status"] == "passed"
+    
+    def test_render_html_with_wrapped_payload(self):
+        """Wrapped payload HTML rendering should work."""
+        report = self._load_real_report()
+        wrapped_payload = {"report": report, "template": "professional"}
+        
+        response = client.post("/render-html", json=wrapped_payload)
+        
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "text/html; charset=utf-8"
+        # Verify key content appears in HTML
+        assert "Comprehensive Risk Assessment" in response.text or "META AI Glasses" in response.text
+    
+    def test_quality_gates_evaluate_canonical_not_wrapper(self):
+        """Quality gates should inspect canonical report, not wrapper object.
+        
+        This is a regression test for the bug where quality gates evaluated
+        the outer {"report": {...}} wrapper instead of the inner canonical report,
+        causing false failures about missing required sections.
+        """
+        report = self._load_real_report()
+        wrapped_payload = {"report": report}
+        
+        # Call validate-report-json which runs quality gates
+        response = client.post("/validate-report-json", json=wrapped_payload)
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Should not have errors about missing findings/evidence/recommendations
+        if not data.get("valid") and "error" in data:
+            errors = data["error"].get("details", [])
+            for err in errors:
+                path = err.get("path", [])
+                # Ensure no errors about missing required properties at root level
+                # (which would indicate wrapper was validated instead of canonical)
+                if len(path) == 0:
+                    assert "'findings'" not in err.get("message", ""), \
+                        "Quality gates validated wrapper - missing findings error at root"
+                    assert "'evidence'" not in err.get("message", ""), \
+                        "Quality gates validated wrapper - missing evidence error at root"
+                    assert "'recommendations'" not in err.get("message", ""), \
+                        "Quality gates validated wrapper - missing recommendations error at root"
+
+
+class TestRealReportFixture:
+    """End-to-end tests using the real Meta AI Glasses report fixture."""
+    
+    def _load_real_report(self):
+        """Load the Meta AI Glasses risk assessment report fixture."""
+        fixture_path = Path(__file__).parents[1] / "examples" / "reports" / "meta-ai-glasses-risk-assessment.example.json"
+        return json.loads(fixture_path.read_text())
+    
+    def test_real_report_has_required_structure(self):
+        """Verify the real report fixture has all required sections."""
+        report = self._load_real_report()
+        
+        # Top-level required sections per schema
+        required_sections = ["report", "engagement", "executive_summary", 
+                            "findings", "evidence", "recommendations", "visualizations"]
+        for section in required_sections:
+            assert section in report, f"Real report fixture missing required section: {section}"
+        
+        # Verify report metadata
+        assert "id" in report["report"]
+        assert "title" in report["report"]
+        assert "type" in report["report"]
+        
+        # Verify engagement
+        assert "id" in report["engagement"]
+        assert "name" in report["engagement"]
+        assert "scope_summary" in report["engagement"]
+        
+        # Verify findings have domain
+        for finding in report["findings"]:
+            assert "domain" in finding, f"Finding {finding.get('id')} missing domain"
+            assert "category" in finding, f"Finding {finding.get('id')} missing category"
+            assert "severity" in finding, f"Finding {finding.get('id')} missing severity"
+        
+        # Verify evidence has domain
+        for evidence in report["evidence"]:
+            assert "domain" in evidence, f"Evidence {evidence.get('id')} missing domain"
+        
+        # Verify recommendations have domain and action
+        for rec in report["recommendations"]:
+            assert "domain" in rec, f"Recommendation {rec.get('id')} missing domain"
+            assert "action" in rec, f"Recommendation {rec.get('id')} missing action"
+            assert "type" in rec["action"], f"Recommendation {rec.get('id')} action missing type"
+            assert "description" in rec["action"], f"Recommendation {rec.get('id')} action missing description"
+        
+        # Verify visualizations use valid enum types
+        valid_types = ["kpi_cards", "severity_distribution", "risk_matrix", 
+                      "financial_exposure_chart", "recommendation_priority"]
+        for viz in report["visualizations"]:
+            assert viz["type"] in valid_types, f"Visualization has invalid type: {viz.get('type')}"
+    
+    def test_full_workflow_with_real_report(self):
+        """Test complete workflow: validate -> html render.
+        
+        PDF rendering is environment-dependent and tested separately in e2e tests.
+        """
+        report = self._load_real_report()
+        wrapped_payload = {"report": report}
+        
+        # Step 1: Validate
+        validate_response = client.post("/validate-report-json", json=wrapped_payload)
+        assert validate_response.status_code == 200
+        validate_data = validate_response.json()
+        assert validate_data["valid"] is True, f"Validation failed: {validate_data}"
+        
+        # Step 2: Render HTML
+        html_response = client.post("/render-html", json={"report": report, "template": "professional"})
+        assert html_response.status_code == 200
+        assert html_response.headers["content-type"] == "text/html; charset=utf-8"
+        html_content = html_response.text
+        
+        # Verify HTML contains expected content
+        assert len(html_content) > 1000, "HTML content is too short"
+        assert "Executive Summary" in html_content or "Risk Assessment" in html_content
+        
+        # Verify report title appears
+        assert report["report"]["title"] in html_content or "META AI Glasses" in html_content

@@ -38,6 +38,29 @@ from engine.quality.quality_gate_enforcer import (
 router = APIRouter()
 
 
+def extract_report_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract canonical report from request payload.
+    
+    Handles both wrapped payloads: { "report": <canonical> }
+    and direct payloads: <canonical>
+    
+    Args:
+        payload: Request body
+        
+    Returns:
+        Canonical report object
+    """
+    # Check if this is a wrapped payload with a 'report' key containing report data
+    if isinstance(payload, dict) and "report" in payload:
+        report_data = payload["report"]
+        # If report_data is a dict with canonical report structure, it's the wrapped report
+        # Canonical reports have: report, engagement, findings, evidence, recommendations, etc.
+        if isinstance(report_data, dict) and any(k in report_data for k in ["findings", "evidence", "recommendations", "engagement", "executive_summary"]):
+            return report_data
+    # Otherwise, assume it's already the canonical report
+    return payload
+
+
 @router.get("/health")
 def healthcheck():
     """Health check endpoint."""
@@ -85,15 +108,17 @@ def compile_dsl(dsl_text: str = Body(..., embed=True)) -> Dict[str, Any]:
 
 
 @router.post("/validate-report-json")
-def validate_report_json(report_json: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
+def validate_report_json(payload: Dict[str, Any] = Body(...)) -> Dict[str, Any]:
     """Validate canonical report JSON against schema.
     
     Args:
-        report_json: The report JSON to validate
+        payload: The report JSON to validate (supports both direct and wrapped: {"report": {...}})
         
     Returns:
         Validation result
     """
+    # Extract canonical report from payload (handles both wrapped and direct)
+    report_json = extract_report_payload(payload)
     result = validate_report_with_details(report_json)
     return result
 
@@ -130,14 +155,14 @@ def compile_report_json(
 
 @router.post("/render-html")
 def render_html(
-    report: Dict[str, Any] = Body(...),
+    payload: Dict[str, Any] = Body(...),
     template: Optional[str] = None,
     theme: Optional[str] = None,
 ) -> HTMLResponse:
     """Render report to HTML.
     
     Args:
-        report: The report JSON to render (direct object, not wrapped)
+        payload: The report JSON to render (supports both direct and wrapped: {"report": {...}})
         template: Optional template name
         theme: Optional theme profile
         
@@ -145,6 +170,9 @@ def render_html(
         HTML response
     """
     try:
+        # Extract canonical report from payload (handles both wrapped and direct)
+        report = extract_report_payload(payload)
+        
         # Validate first
         validation = validate_report_with_details(report)
         if not validation["valid"]:
@@ -165,7 +193,7 @@ def render_html(
 
 @router.post("/render-pdf")
 def render_pdf(
-    report: Dict[str, Any] = Body(...),
+    payload: Dict[str, Any] = Body(...),
     template: Optional[str] = None,
     theme: Optional[str] = None,
     return_manifest: bool = True,
@@ -174,7 +202,7 @@ def render_pdf(
     """Render report to PDF.
     
     Args:
-        report: The report JSON to render (direct object, not wrapped)
+        payload: The report JSON to render (supports both direct and wrapped: {"report": {...}})
         template: Optional template name
         theme: Optional theme profile
         return_manifest: Whether to include render manifest
@@ -184,6 +212,9 @@ def render_pdf(
         PDF file path and optional manifest
     """
     try:
+        # Extract canonical report from payload (handles both wrapped and direct)
+        report = extract_report_payload(payload)
+        
         # Validate first
         validation = validate_report_with_details(report)
         if not validation["valid"]:
@@ -244,7 +275,7 @@ def render_pdf(
 
 @router.post("/export-report")
 def export_report(
-    report: Dict[str, Any] = Body(...),
+    payload: Dict[str, Any] = Body(...),
     format: str = "markdown",
     template: Optional[str] = None,
     theme: Optional[str] = None,
@@ -252,7 +283,7 @@ def export_report(
     """Export report to various formats.
     
     Args:
-        report: The report JSON to export
+        payload: The report JSON to export (supports both direct and wrapped: {"report": {...}})
         format: Export format (json, markdown, html, csv)
         template: Optional template name
         theme: Optional theme profile
@@ -263,6 +294,9 @@ def export_report(
     from engine.export.export_manager import export_report as do_export
     
     try:
+        # Extract canonical report from payload (handles both wrapped and direct)
+        report = extract_report_payload(payload)
+        
         content = do_export(
             report,
             format,

@@ -131,6 +131,18 @@ def _resolve_refs(
                 lookup_key = f"{current_base}/{ref_name}" if current_base else ref_name
             else:
                 lookup_key = ref_path[2:]
+        elif ref_path.startswith("../"):
+            # Parent directory reference - navigate up from current base
+            if current_base:
+                # Go up one directory level from current_base
+                parent_base = str(Path(current_base).parent)
+                ref_name = ref_path[3:]  # Remove ../
+                if parent_base and parent_base != ".":
+                    lookup_key = f"{parent_base}/{ref_name}"
+                else:
+                    lookup_key = ref_name
+            else:
+                lookup_key = ref_path[3:]
         else:
             lookup_key = ref_path
         

@@ -68,14 +68,14 @@ def root():
 <body>
     <div class="container">
         <h1>Metis Report Engine</h1>
-        <div class="status">✅ Server Running</div>
+        <div class="status">Server Running</div>
         <p>Version: 0.1.0</p>
         
         <h2>Quick Links</h2>
         <div class="links">
-            <a href="/docs">📚 API Documentation (Swagger UI)</a>
-            <a href="/redoc">📖 API Documentation (ReDoc)</a>
-            <a href="/health">🏥 Health Check</a>
+            <a href="/docs">API Documentation (Swagger UI)</a>
+            <a href="/redoc">API Documentation (ReDoc)</a>
+            <a href="/health">Health Check</a>
         </div>
         
         <h2>API Endpoints</h2>

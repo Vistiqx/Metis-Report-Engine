@@ -72,5 +72,84 @@
 
 ---
 
-*[Subsequent phases will be logged here as they complete]*
+## Bug Fix Log: API Payload Handling and Schema Alignment
+
+**Date:** 2026-03-06 (during Phase 10 stabilization)
+
+### Issue Summary
+Real end-to-end test using PowerShell script and canonical JSON report fixture failed with:
+- Quality gates blocking PDF generation due to schema validation failures
+- Error messages indicated validation was checking `report.report`, `report.engagement`, etc.
+- Root cause: API routes were validating wrapper object `{"report": {...}}` instead of canonical report
+
+### Root Causes Identified
+
+1. **API Payload Contract Mismatch**
+   - PowerShell script sends wrapped payload: `{"report": <canonical>}`
+   - API routes were validating entire payload instead of extracting canonical report
+   - Schema validation failed because wrapper doesn't have findings/evidence/recommendations fields
+
+2. **Schema Reference Error**
+   - `metis_report.schema.json` referenced `./core/report.schema.json` which expects nested structure
+   - Should reference `./core/report_metadata.schema.json` for the flat canonical format
+   - Core report schema expects `report: {report, engagement, findings...}` (nested)
+   - But canonical format is flat: `{report, engagement, findings...}` (top-level)
+
+### Fixes Applied
+
+1. **api/routes.py**
+   - Added `extract_report_payload()` helper function
+   - Detects wrapped payloads and extracts canonical report
+   - Supports both `{"report": {...}}` and direct canonical JSON
+   - Updated all relevant endpoints:
+     - `validate-report-json`
+     - `render-html`
+     - `render-pdf`
+     - `export-report`
+
+2. **schema/metis_report.schema.json**
+   - Changed `"report": {"$ref": "./core/report.schema.json"}` 
+   - To: `"report": {"$ref": "./core/report_metadata.schema.json"}`
+   - Added missing required fields: `engagement`, `executive_summary`, `visualizations`
+   - Added engagement and executive_summary property definitions
+   - Added proper appendices schema with title/content requirements
+
+3. **engine/parser/schema_validator.py**
+   - Fixed `../` path resolution in `_resolve_refs()`
+   - Parent directory references now correctly resolved against current base
+
+### Tests Added
+
+1. **tests/test_api.py**
+   - `TestWrappedPayloadHandling` class with 4 regression tests
+   - `TestRealReportFixture` class with 2 end-to-end tests
+   - Tests verify both wrapped and direct payload handling
+   - Tests verify quality gates evaluate canonical report not wrapper
+   - Tests use real Meta AI Glasses risk assessment fixture
+
+### Verification
+
+- All 272 tests pass (263 core + 9 E2E, 1 skipped)
+- Real report fixture validates successfully
+- HTML rendering works with wrapped payload
+- PDF rendering works with wrapped payload (tested on dev server)
+- Schema $ref resolution fixed for `../` paths
+
+### Files Modified
+
+- `api/routes.py` - Added payload extraction helper
+- `schema/metis_report.schema.json` - Fixed schema references and requirements
+- `engine/parser/schema_validator.py` - Fixed `../` path resolution
+- `tests/test_api.py` - Added 6 new regression tests
+- `docs/BUILD_EXECUTION_LOG.md` - This documentation
+
+### Impact
+
+API now correctly handles both:
+- **Wrapped payload** (PowerShell client): `{"report": {...canonical...}}`
+- **Direct payload**: `{...canonical...}`
+
+No breaking changes to existing functionality. All existing tests continue to pass.
+
+---
 
