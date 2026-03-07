@@ -9,12 +9,13 @@ Implements endpoints per API_CONTRACT.md:
 - POST /render-pdf
 """
 
-from fastapi import APIRouter, HTTPException, Body
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi import APIRouter, HTTPException, Body, Query
+from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from typing import Any, Dict, Optional
 from pathlib import Path
 import tempfile
 import json
+import os
 
 from engine.parser.report_loader import load_report_json
 from engine.parser.schema_validator import (
@@ -34,6 +35,10 @@ from engine.quality.quality_gate_enforcer import (
     enforce_quality_gates,
     should_block_generation,
 )
+
+# Artifact directory for PDF storage
+ARTIFACT_DIR = Path(tempfile.gettempdir()) / "metis_artifacts"
+ARTIFACT_DIR.mkdir(exist_ok=True)
 
 router = APIRouter()
 
@@ -196,20 +201,20 @@ def render_pdf(
     payload: Dict[str, Any] = Body(...),
     template: Optional[str] = None,
     theme: Optional[str] = None,
-    return_manifest: bool = True,
+    return_type: str = Query("file", description="Return type: 'file' (default) returns PDF directly, 'metadata' returns JSON with download URL"),
     skip_quality_gates: bool = False,
-) -> Dict[str, Any]:
+):
     """Render report to PDF.
     
     Args:
         payload: The report JSON to render (supports both direct and wrapped: {"report": {...}})
         template: Optional template name
         theme: Optional theme profile
-        return_manifest: Whether to include render manifest
+        return_type: "file" returns PDF directly (default), "metadata" returns JSON with artifact URL
         skip_quality_gates: Whether to skip quality gate enforcement
         
     Returns:
-        PDF file path and optional manifest
+        PDF file (default) or metadata JSON with artifact URL
     """
     try:
         # Extract canonical report from payload (handles both wrapped and direct)
@@ -238,11 +243,13 @@ def render_pdf(
         else:
             html = render_report_html(report, template_name=template, theme_profile=theme)
         
-        # Create temp PDF file
-        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
-            pdf_path = tmp.name
+        # Generate safe filename
+        report_id = report.get("report", {}).get("id", "report")
+        report_title = report.get("report", {}).get("title", "untitled")
+        safe_filename = f"{report_id}_{report_title[:50]}.pdf".replace(" ", "_").replace("/", "_")
         
-        # Render PDF
+        # Save to artifact directory
+        pdf_path = ARTIFACT_DIR / safe_filename
         render_pdf_from_html(html, pdf_path)
         
         # Validate PDF
@@ -250,27 +257,61 @@ def render_pdf(
         if not pdf_validation["valid"]:
             raise HTTPException(status_code=500, detail=f"PDF generation failed: {pdf_validation['error']}")
         
-        # Build manifest
-        result = {
-            "status": "success",
-            "pdf_path": pdf_path,
-            "pdf_size": pdf_validation["size"],
-        }
-        
-        if return_manifest:
+        # Return based on requested type
+        if return_type == "metadata":
+            # Return metadata with download URL
             manifest = build_render_manifest(
                 report,
                 template_id=template or "default",
                 theme_profile=theme or "default",
                 validation_status="passed",
-                output_pdf_path=pdf_path,
+                output_pdf_path=str(pdf_path),
             )
-            result["manifest"] = manifest
-        
-        return result
+            return {
+                "status": "success",
+                "artifact_url": f"/artifacts/{safe_filename}",
+                "filename": safe_filename,
+                "pdf_size": pdf_validation["size"],
+                "manifest": manifest,
+            }
+        else:
+            # Return PDF file directly (default)
+            return FileResponse(
+                path=pdf_path,
+                media_type="application/pdf",
+                filename=safe_filename,
+            )
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"PDF rendering failed: {e}")
+
+
+@router.get("/artifacts/{filename}")
+def get_artifact(filename: str):
+    """Retrieve a generated PDF artifact by filename.
+    
+    Args:
+        filename: The artifact filename
+        
+    Returns:
+        PDF file
+    """
+    # Validate filename (prevent directory traversal)
+    if ".." in filename or "/" in filename or "\\" in filename:
+        raise HTTPException(status_code=400, detail="Invalid filename")
+    
+    artifact_path = ARTIFACT_DIR / filename
+    
+    # Check if file exists
+    if not artifact_path.exists():
+        raise HTTPException(status_code=404, detail="Artifact not found")
+    
+    # Return PDF
+    return FileResponse(
+        path=artifact_path,
+        media_type="application/pdf",
+        filename=filename,
+    )
 
 
 @router.post("/export-report")

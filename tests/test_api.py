@@ -157,20 +157,79 @@ class TestRenderPDF:
     """Test PDF rendering endpoint."""
     
     @pytest.mark.skip(reason="PDF generation requires Playwright browser")
-    def test_render_pdf(self):
+    def test_render_pdf_returns_file_response(self):
+        """POST /render-pdf should return PDF file directly by default."""
         report = {
-            "report": {"id": "RPT-001", "title": "Test Report"},
+            "report": {"id": "RPT-001", "title": "Test Report", "type": "test"},
+            "engagement": {"id": "ENG-001", "name": "Test", "scope_summary": "Test"},
+            "executive_summary": {"overall_risk_rating": "Low", "summary": "Test"},
             "findings": [],
             "evidence": [],
             "recommendations": [],
+            "visualizations": [],
         }
         response = client.post("/render-pdf", json=report)
         
         assert response.status_code == 200
+        # Should return PDF content, not JSON with temp path
+        assert response.headers.get("content-type") == "application/pdf"
+        # Should have content-disposition with filename
+        assert "content-disposition" in response.headers
+        assert ".pdf" in response.headers.get("content-disposition", "")
+        # Body should be non-empty binary content
+        assert len(response.content) > 100
+    
+    @pytest.mark.skip(reason="PDF generation requires Playwright browser")
+    def test_render_pdf_metadata_mode(self):
+        """POST /render-pdf?return_type=metadata should return JSON with artifact URL."""
+        report = {
+            "report": {"id": "RPT-002", "title": "Test Report 2", "type": "test"},
+            "engagement": {"id": "ENG-002", "name": "Test", "scope_summary": "Test"},
+            "executive_summary": {"overall_risk_rating": "Low", "summary": "Test"},
+            "findings": [],
+            "evidence": [],
+            "recommendations": [],
+            "visualizations": [],
+        }
+        response = client.post("/render-pdf?return_type=metadata", json=report)
+        
+        assert response.status_code == 200
         data = response.json()
         assert data["status"] == "success"
-        assert "pdf_path" in data
+        assert "artifact_url" in data
+        assert "/artifacts/" in data["artifact_url"]
+        assert "filename" in data
+        assert data["filename"].endswith(".pdf")
         assert "pdf_size" in data
+        assert data["pdf_size"] > 0
+    
+    @pytest.mark.skip(reason="PDF generation requires Playwright browser")
+    def test_artifact_retrieval(self):
+        """GET /artifacts/{filename} should return the generated PDF."""
+        # First generate a PDF in metadata mode
+        report = {
+            "report": {"id": "RPT-003", "title": "Test Report 3", "type": "test"},
+            "engagement": {"id": "ENG-003", "name": "Test", "scope_summary": "Test"},
+            "executive_summary": {"overall_risk_rating": "Low", "summary": "Test"},
+            "findings": [],
+            "evidence": [],
+            "recommendations": [],
+            "visualizations": [],
+        }
+        response = client.post("/render-pdf?return_type=metadata", json=report)
+        data = response.json()
+        artifact_url = data["artifact_url"]
+        
+        # Now retrieve it
+        response = client.get(artifact_url)
+        assert response.status_code == 200
+        assert response.headers.get("content-type") == "application/pdf"
+        assert len(response.content) > 100
+    
+    def test_artifact_not_found(self):
+        """GET /artifacts/{invalid} should return 404."""
+        response = client.get("/artifacts/nonexistent_file.pdf")
+        assert response.status_code == 404
 
 
 class TestGenerateReport:

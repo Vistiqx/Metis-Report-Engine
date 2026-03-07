@@ -200,3 +200,109 @@ No breaking changes to existing functionality. All existing tests continue to pa
 
 ---
 
+
+## PDF Delivery Fix
+
+**Date:** 2026-03-06
+
+### Issue Summary
+POST /render-pdf was returning a dead temp file path (`/tmp/tmpXXXXXX.pdf`) that clients couldn't retrieve. The endpoint returned JSON with `pdf_path` pointing to a non-served filesystem location.
+
+### Root Cause
+- PDF was written to a temp file via `tempfile.NamedTemporaryFile()`
+- The temp path was returned in JSON response
+- No route served files from `/tmp/` directory
+- Clients attempting to download the URL got 404
+
+### Solution Implemented
+
+**Two-Mode Design:**
+
+1. **File Mode (default)**: `POST /render-pdf`
+   - Returns PDF directly as `FileResponse`
+   - Content-Type: `application/pdf`
+   - Content-Disposition: `attachment; filename="..."`
+   - No separate download step required
+   
+2. **Metadata Mode (optional)**: `POST /render-pdf?return_type=metadata`
+   - Returns JSON with artifact URL
+   - Artifact stored in managed directory
+   - GET `/artifacts/{filename}` serves the PDF
+
+**Key Changes:**
+- Added `ARTIFACT_DIR` for managed PDF storage
+- PDF filenames derived from report ID/title
+- Added `GET /artifacts/{filename}` endpoint
+- Filename validation prevents directory traversal
+- Temp files replaced with named artifacts
+
+### API Behavior
+
+**Default (File Mode):**
+```bash
+curl -X POST http://server:8000/render-pdf \
+  -H "Content-Type: application/json" \
+  -d '{"report": {...}}' \
+  -o output.pdf
+```
+Returns: PDF file directly
+
+**Metadata Mode:**
+```bash
+curl -X POST "http://server:8000/render-pdf?return_type=metadata" \
+  -H "Content-Type: application/json" \
+  -d '{"report": {...}}'
+```
+Returns:
+```json
+{
+  "status": "success",
+  "artifact_url": "/artifacts/RPT-001_report.pdf",
+  "filename": "RPT-001_report.pdf",
+  "pdf_size": 32762
+}
+```
+
+Then download:
+```bash
+curl http://server:8000/artifacts/RPT-001_report.pdf -o output.pdf
+```
+
+### Files Modified
+
+- `api/routes.py`:
+  - Added `ARTIFACT_DIR` constant
+  - Rewrote `render_pdf()` to support both modes
+  - Added `get_artifact()` endpoint
+  - Removed dead temp path behavior
+  
+- `tests/test_api.py`:
+  - Updated `TestRenderPDF` with 4 new tests
+  - Tests verify file response, metadata mode, artifact retrieval
+  - Tests verify 404 for invalid artifacts
+
+### Test Results
+
+- File mode returns `application/pdf` ✓
+- Metadata mode returns valid artifact URL ✓
+- Artifact retrieval works ✓
+- Invalid artifact returns 404 ✓
+- All existing tests still pass ✓
+
+### Backward Compatibility
+
+**Breaking Change:** The response format changed from JSON with `pdf_path` to either:
+- PDF file directly (default), OR
+- JSON with `artifact_url` (metadata mode)
+
+This is intentional - the old behavior was broken. Clients using the old JSON response will need to update, but they were already broken since the temp path was unusable.
+
+### Verification
+
+Tested on dev server (192.168.239.197:8000):
+- Default mode returns PDF file ✓
+- Metadata mode returns valid download URL ✓
+- Artifact endpoint serves PDF ✓
+- Real Meta AI Glasses report generates successfully ✓
+
+---
