@@ -5,17 +5,28 @@ This module provides flexible HTML rendering with:
 - Theme profile selection
 - Visualization injection
 - Table of contents generation
+- Schema version detection with automatic renderer selection
 """
 
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from engine.visualizations.chart_registry import get_renderer
 from engine.renderer.toc_generator import build_toc
+from engine.renderer.renderer_selector import (
+    detect_schema_version,
+    select_renderer,
+    log_render_selection,
+)
+from engine.renderer.v2_transformer import transform_v2_to_template_context
+
+
+logger = logging.getLogger(__name__)
 
 
 def render_report_html(
@@ -27,8 +38,8 @@ def render_report_html(
 
     Args:
         payload: The canonical report JSON
-        template_name: Template to use (default: report_template.html)
-        theme_profile: Theme profile name (default: default)
+        template_name: Template to use (default: auto-detected based on schema version)
+        theme_profile: Theme profile name (default: auto-detected based on schema version)
 
     Returns:
         Rendered HTML string
@@ -40,14 +51,67 @@ def render_report_html(
         autoescape=select_autoescape(["html", "xml"])
     )
 
-    # Prepare rendering context
-    context = _prepare_render_context(payload, theme_profile)
-
-    # Select template
-    template_id = template_name or payload.get("report", {}).get("template", "report_template.html")
+    # Detect schema version and select appropriate renderer/template
+    schema_version = detect_schema_version(payload)
+    renderer_config = select_renderer(payload)
+    
+    # Log the render path selection
+    logger.info(f"[RENDER] Schema version detected: {schema_version}")
+    logger.info(f"[RENDER] Selected renderer: {renderer_config['renderer']}")
+    logger.info(f"[RENDER] Selected template: {renderer_config['template']}")
+    
+    # Determine template and theme
+    if template_name:
+        # User explicitly specified template, use it
+        template_id = template_name
+        actual_theme = theme_profile or renderer_config["theme"]
+        logger.info(f"[RENDER] Using explicit template: {template_id}")
+    else:
+        # Auto-select based on schema version
+        template_id = renderer_config["template"]
+        actual_theme = theme_profile or renderer_config["theme"]
+        logger.info(f"[RENDER] Auto-selected template for schema v{schema_version}: {template_id}")
+    
+    # Prepare rendering context based on schema version
+    if schema_version.startswith("2"):
+        # Use v2 transformer for consulting-grade rendering
+        logger.info("[RENDER] Using v2 transformer for context preparation")
+        context, charts_generated = transform_v2_to_template_context(payload)
+        
+        # Log render details
+        sections_count = len(context.get("report", {}).get("sections", []))
+        viz_count = len(context.get("visualizations", []))
+        log_render_selection(
+            payload,
+            renderer_config,
+            sections_count=sections_count,
+            visualizations_count=viz_count,
+            charts_generated=charts_generated,
+        )
+    else:
+        # Use legacy context preparation for v1
+        logger.info("[RENDER] Using legacy context preparation for schema v1")
+        context = _prepare_render_context(payload, actual_theme)
+        sections_count = 0
+        viz_count = len(context.get("visualizations", []))
+        charts_generated = 0
+        
+        log_render_selection(
+            payload,
+            renderer_config,
+            sections_count=sections_count,
+            visualizations_count=viz_count,
+            charts_generated=charts_generated,
+        )
+    
+    # Load template
     template = env.get_template(template_id)
-
-    return template.render(**context)
+    
+    logger.info(f"[RENDER] Rendering template: {template_id}")
+    html = template.render(**context)
+    logger.info(f"[RENDER] HTML generation complete: {len(html)} bytes")
+    
+    return html
 
 
 def _prepare_render_context(

@@ -16,6 +16,7 @@ from pathlib import Path
 import tempfile
 import json
 import os
+import logging
 
 from engine.parser.report_loader import load_report_json
 from engine.parser.schema_validator import (
@@ -30,11 +31,21 @@ from engine.scoring.risk_calculator import summarize_risk_distribution
 from engine.renderer.html_renderer import render_report_html, render_professional_html
 from engine.renderer.pdf_renderer import render_pdf_from_html, validate_pdf_output
 from engine.renderer.render_manifest import build_render_manifest
+from engine.renderer.renderer_selector import (
+    detect_schema_version,
+    select_renderer,
+    log_render_selection,
+)
+from engine.renderer.v2_transformer import transform_v2_to_template_context
 
 from engine.quality.quality_gate_enforcer import (
     enforce_quality_gates,
     should_block_generation,
 )
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Artifact directory for PDF storage
 ARTIFACT_DIR = Path(tempfile.gettempdir()) / "metis_artifacts"
@@ -204,12 +215,15 @@ def render_pdf(
     return_type: str = Query("file", description="Return type: 'file' (default) returns PDF directly, 'metadata' returns JSON with download URL"),
     skip_quality_gates: bool = False,
 ):
-    """Render report to PDF.
+    """Render report to PDF with automatic schema version detection.
+    
+    Automatically selects consulting-grade renderer for schema v2 reports
+    and legacy renderer for schema v1 reports.
     
     Args:
         payload: The report JSON to render (supports both direct and wrapped: {"report": {...}})
-        template: Optional template name
-        theme: Optional theme profile
+        template: Optional template name (overrides auto-selection)
+        theme: Optional theme profile (overrides auto-selection)
         return_type: "file" returns PDF directly (default), "metadata" returns JSON with artifact URL
         skip_quality_gates: Whether to skip quality gate enforcement
         
@@ -217,13 +231,25 @@ def render_pdf(
         PDF file (default) or metadata JSON with artifact URL
     """
     try:
+        logger.info("=" * 60)
+        logger.info("PDF RENDER ENDPOINT INVOKED")
+        logger.info("=" * 60)
+        
         # Extract canonical report from payload (handles both wrapped and direct)
         report = extract_report_payload(payload)
+        
+        # Detect schema version and log it
+        schema_version = detect_schema_version(report)
+        renderer_config = select_renderer(report)
+        
+        logger.info(f"[RENDER-PDF] Detected schema version: {schema_version}")
+        logger.info(f"[RENDER-PDF] Renderer selected: {renderer_config['renderer']}")
+        logger.info(f"[RENDER-PDF] Template selected: {renderer_config['template']}")
         
         # Validate first
         validation = validate_report_with_details(report)
         if not validation["valid"]:
-            print(f"Warning: Schema validation failed: {validation.get('error', {}).get('message', '')}")
+            logger.warning(f"[RENDER-PDF] Schema validation failed: {validation.get('error', {}).get('message', '')}")
         
         # Enforce quality gates (block with warning behavior)
         quality_result = enforce_quality_gates(report)
@@ -237,11 +263,21 @@ def render_pdf(
                 response["note"] = "Use skip_quality_gates=true to override"
             raise HTTPException(status_code=400, detail=response)
         
-        # Generate HTML
-        if template == "professional":
-            html = render_professional_html(report, theme_profile=theme or "vistiqx_consulting")
+        # Determine template and theme (explicit overrides auto-selection)
+        if template:
+            actual_template = template
+            logger.info(f"[RENDER-PDF] Using explicit template: {actual_template}")
         else:
-            html = render_report_html(report, template_name=template, theme_profile=theme)
+            actual_template = renderer_config["template"]
+            logger.info(f"[RENDER-PDF] Using auto-selected template for schema v{schema_version}: {actual_template}")
+        
+        actual_theme = theme or renderer_config["theme"]
+        logger.info(f"[RENDER-PDF] Using theme: {actual_theme}")
+        
+        # Generate HTML with automatic renderer selection based on schema version
+        logger.info(f"[RENDER-PDF] Generating HTML...")
+        html = render_report_html(report, template_name=actual_template, theme_profile=actual_theme)
+        logger.info(f"[RENDER-PDF] HTML generated: {len(html)} bytes")
         
         # Generate safe filename
         report_id = report.get("report", {}).get("id", "report")
@@ -250,28 +286,44 @@ def render_pdf(
         
         # Save to artifact directory
         pdf_path = ARTIFACT_DIR / safe_filename
+        logger.info(f"[RENDER-PDF] Rendering PDF to: {pdf_path}")
         render_pdf_from_html(html, pdf_path)
+        logger.info(f"[RENDER-PDF] PDF saved successfully")
         
         # Validate PDF
         pdf_validation = validate_pdf_output(pdf_path)
         if not pdf_validation["valid"]:
             raise HTTPException(status_code=500, detail=f"PDF generation failed: {pdf_validation['error']}")
         
+        logger.info(f"[RENDER-PDF] PDF validation passed: {pdf_validation['size']} bytes")
+        logger.info("=" * 60)
+        
         # Return based on requested type
         if return_type == "metadata":
-            # Return metadata with download URL
+            # Build enhanced manifest with renderer info
             manifest = build_render_manifest(
                 report,
-                template_id=template or "default",
-                theme_profile=theme or "default",
+                template_id=actual_template,
+                theme_profile=actual_theme,
                 validation_status="passed",
                 output_pdf_path=str(pdf_path),
             )
+            # Add renderer info to manifest
+            manifest["renderer_info"] = {
+                "schema_version": schema_version,
+                "renderer": renderer_config["renderer"],
+                "template": actual_template,
+                "theme": actual_theme,
+            }
+            
             return {
                 "status": "success",
                 "artifact_url": f"/artifacts/{safe_filename}",
                 "filename": safe_filename,
                 "pdf_size": pdf_validation["size"],
+                "schema_version": schema_version,
+                "renderer": renderer_config["renderer"],
+                "template": actual_template,
                 "manifest": manifest,
             }
         else:
@@ -283,6 +335,7 @@ def render_pdf(
             )
         
     except Exception as e:
+        logger.error(f"[RENDER-PDF] Error: {e}")
         raise HTTPException(status_code=500, detail=f"PDF rendering failed: {e}")
 
 

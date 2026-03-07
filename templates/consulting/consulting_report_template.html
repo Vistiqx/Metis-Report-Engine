@@ -666,14 +666,14 @@
             
             {% elif block.type == 'bullet_list' %}
                 <ul class="bullet-list">
-                    {% for item in block.items %}
+                    {% for item in block.items_list %}
                     <li>{{ item }}</li>
                     {% endfor %}
                 </ul>
             
             {% elif block.type == 'numbered_list' %}
                 <ol class="numbered-list">
-                    {% for item in block.items %}
+                    {% for item in block.items_list %}
                     <li>{{ item }}</li>
                     {% endfor %}
                 </ol>
