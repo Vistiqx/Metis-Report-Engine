@@ -36,22 +36,26 @@ def transform_v2_to_template_context(report: Dict[str, Any]) -> tuple[Dict[str, 
     # Extract report data - v2 has report as an object with metadata
     report_data = report.get("report", {})
     
-    # Check if using new nested metadata structure (v2.0+)
-    metadata = report_data.get("metadata", {})
-    if metadata:
-        # New v2 structure with nested metadata
+    # Check if using new nested metadata structure (v2.0+) - metadata nested under report.metadata
+    nested_metadata = report_data.get("metadata", {})
+    # Check for flat structure - metadata fields directly on report object
+    has_flat_structure = any(k in report_data for k in ["id", "title", "client", "author", "version"])
+    
+    if nested_metadata and isinstance(nested_metadata, dict) and len(nested_metadata) > 0:
+        # New v2 structure with nested metadata under report.metadata
+        logger.info("[V2-TRANSFORM] Using nested metadata structure (report.metadata)")
         context["report"] = {
             "metadata": {
-                "id": metadata.get("id", "unknown"),
-                "title": metadata.get("title", "Untitled Report"),
-                "subtitle": metadata.get("subtitle", ""),
-                "type": metadata.get("type", "risk_assessment"),
-                "classification": metadata.get("classification", "Confidential"),
-                "version": metadata.get("version", "1.0"),
-                "date_created": metadata.get("date_created", ""),
-                "date_published": metadata.get("date_published") or metadata.get("date_created", ""),
-                "client": metadata.get("client", {"name": "Client Organization"}),
-                "consultant": metadata.get("consultant", {"name": "Consultant", "firm": "Consulting Firm"}),
+                "id": nested_metadata.get("id", "unknown"),
+                "title": nested_metadata.get("title", "Untitled Report"),
+                "subtitle": nested_metadata.get("subtitle", ""),
+                "type": nested_metadata.get("type", "risk_assessment"),
+                "classification": nested_metadata.get("classification", "Confidential"),
+                "version": nested_metadata.get("version", "1.0"),
+                "date_created": nested_metadata.get("date_created", ""),
+                "date_published": nested_metadata.get("date_published") or nested_metadata.get("date_created", ""),
+                "client": nested_metadata.get("client", {"name": "Client Organization"}),
+                "consultant": nested_metadata.get("consultant", {"name": "Consultant", "firm": "Consulting Firm"}),
             },
             "sections": [],
             "findings": [],
@@ -65,8 +69,9 @@ def transform_v2_to_template_context(report: Dict[str, Any]) -> tuple[Dict[str, 
         appendices = report_data.get("appendices", [])
         exec_summary = report_data.get("executive_summary", {})
         sections = report_data.get("sections", [])
-    else:
-        # Legacy v2 structure with flat properties
+    elif has_flat_structure:
+        # V2 structure with flat metadata fields directly on report object
+        logger.info("[V2-TRANSFORM] Using flat metadata structure (fields on report)")
         context["report"] = {
             "metadata": {
                 "id": report_data.get("id", "unknown"),
@@ -93,12 +98,38 @@ def transform_v2_to_template_context(report: Dict[str, Any]) -> tuple[Dict[str, 
             "appendices": [],
         }
         
-        # Extract from root level
+        # Extract from root level (flat structure)
         findings = report.get("findings", [])
         recommendations = report.get("recommendations", [])
         appendices = report.get("appendices", [])
         exec_summary = report.get("executive_summary", {})
-        sections = report_data.get("sections", [])
+        sections = []  # Flat structure doesn't have sections array
+    else:
+        # Fallback - use report_data as-is
+        logger.info("[V2-TRANSFORM] Using fallback structure")
+        context["report"] = {
+            "metadata": {
+                "id": report_data.get("id", "unknown"),
+                "title": report_data.get("title", "Untitled Report"),
+                "subtitle": "",
+                "type": "risk_assessment",
+                "classification": "Confidential",
+                "version": "1.0",
+                "date_created": "",
+                "date_published": "",
+                "client": {"name": "Client Organization"},
+                "consultant": {"name": "Consultant", "firm": "Consulting Firm"},
+            },
+            "sections": [],
+            "findings": [],
+            "recommendations": [],
+            "appendices": [],
+        }
+        findings = report.get("findings", [])
+        recommendations = report.get("recommendations", [])
+        appendices = report.get("appendices", [])
+        exec_summary = report.get("executive_summary", {})
+        sections = []
     
     # Transform executive summary
     if exec_summary:
